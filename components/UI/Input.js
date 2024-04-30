@@ -24,7 +24,7 @@ const Input = forwardRef(
       secure = false,
       value,
     },
-    ref,
+    ref
   ) => {
     const [isSecureEntry, setIsSecureEntry] = useState(secure);
 
@@ -63,7 +63,7 @@ const Input = forwardRef(
         </View>
       </View>
     );
-  },
+  }
 );
 
 export default Input;
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderColor: "gray",
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: 20,
   },
   input: {
     flex: 1,

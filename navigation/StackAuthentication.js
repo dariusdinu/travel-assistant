@@ -14,16 +14,16 @@ export default function AuthenticationStack() {
         name="SignIn"
         component={SignInScreen}
         options={{
-          title: "Autentificare",
-          animationTypeForReplace: !auth.isSignedIn ? "pop" : "push",
+          // animationTypeForReplace: !auth.isSignedIn ? "pop" : "push",
+          headerShown: false,
         }}
       />
       <Stack.Screen
         name="SignUp"
         component={SignUpScreen}
         options={{
-          title: "Înregistrare",
-          animationTypeForReplace: !auth.isSignedIn ? "pop" : "push",
+          // animationTypeForReplace: !auth.isSignedIn ? "pop" : "push",
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

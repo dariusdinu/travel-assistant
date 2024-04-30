@@ -17,7 +17,7 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
   const [enteredBirthDate, setEnteredBirthDate] = useState(new Date());
   const [enteredEmail, setEnteredEmail] = useState("marius.darius@email.com");
   const [enteredConfirmEmail, setEnteredConfirmEmail] = useState(
-    "marius.darius@email.com",
+    "marius.darius@email.com"
   );
   const [enteredPassword, setEnteredPassword] = useState("Qwertyuiop.1");
   const [enteredConfirmPassword, setEnteredConfirmPassword] =
