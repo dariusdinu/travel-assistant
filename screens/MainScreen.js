@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 import { AuthContext } from "../store/AuthContext";
 import TabNavigator from "../navigation/TabNavigator";
+import { FlatButton } from "../components/UI";
 
 export default function MainScreen() {
   const navigation = useNavigation();
@@ -16,9 +17,9 @@ export default function MainScreen() {
           source={require("../assets/travel-icon.png")}
           style={styles.image}
         />
-        <Pressable>
+        <FlatButton>
           <Text onPress={auth.signOut}>Exit the app</Text>
-        </Pressable>
+        </FlatButton>
         <Text>Welcome back, traveler!</Text>
       </View>
     </TabNavigator>

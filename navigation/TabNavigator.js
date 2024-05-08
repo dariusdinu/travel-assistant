@@ -1,10 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import TripPlanningOptions from "../screens/TripPlanningOptionsScreen";
 import UserScreen from "../screens/UserScreen";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DashboardScreen, ExploreScreen } from "../screens";
 import HelpScreen from "../screens/HelpScreen";
+import TripPlanner from "../screens/TripPlannerScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -43,6 +43,7 @@ export default function TabNavigator() {
         tabBarItemStyle: {
           marginVertical: 10,
         },
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tab.Screen
@@ -65,8 +66,8 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="TripPlanningOptions"
-        component={TripPlanningOptions}
+        name="TripPlanner"
+        component={TripPlanner}
         options={{
           ...TabBarButtonsStyle,
           tabBarLabel: "plan a trip",

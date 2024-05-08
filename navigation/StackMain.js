@@ -3,7 +3,7 @@ import MainScreen from "../screens/MainScreen";
 
 const Stack = createNativeStackNavigator();
 
-export default function StackNavigator() {
+export default function StackMain() {
   return (
     <Stack.Navigator>
       <Stack.Screen

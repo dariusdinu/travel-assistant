@@ -21,7 +21,7 @@ function SignInScreen() {
   }
 
   if (isAuthenticating) {
-    return <LoadingOverlay message="Autentificare în curs..." />;
+    return <LoadingOverlay message="Autentificare în curs... " />;
   }
 
   return (

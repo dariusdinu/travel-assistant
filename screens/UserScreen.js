@@ -3,6 +3,7 @@ import { styles } from "../styles/WelcomeStyle";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 import { AuthContext } from "../store/AuthContext";
+import { FlatButton } from "../components/UI";
 
 function UserScreen() {
   const auth = useContext(AuthContext);
@@ -13,9 +14,9 @@ function UserScreen() {
         source={require("../assets/travel-icon.png")}
         style={styles.image}
       />
-      <Pressable>
+      <FlatButton>
         <Text onPress={auth.signOut}>Exit the app</Text>
-      </Pressable>
+      </FlatButton>
       <Text>Welcome back, traveler!</Text>
     </View>
   );

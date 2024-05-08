@@ -22,6 +22,7 @@ const Input = forwardRef(
       placeholder,
       returnKeyType,
       secure = false,
+      inputMode = "text",
       value,
     },
     ref
@@ -47,6 +48,7 @@ const Input = forwardRef(
             secureTextEntry={isSecureEntry}
             style={[styles.input, isInvalid && styles.inputInvalid]}
             value={value}
+            inputMode={inputMode}
           />
           {secure && (
             <TouchableOpacity

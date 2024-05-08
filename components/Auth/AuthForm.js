@@ -104,7 +104,10 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
               returnKeyType="next"
               value={enteredLastName}
             />
-            <DateInput />
+            <DateInput
+              label="When is your birthday?"
+              enteredDate={enteredBirthDate.toDateString()}
+            />
           </>
         )}
         <Input

@@ -7,7 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import StackAuthentication from "./navigation/StackAuthentication";
-import StackNavigator from "./navigation/StackNavigator";
+import StackMain from "./navigation/StackMain";
 import AuthContextProvider, { AuthContext } from "./store/AuthContext";
 
 function Navigation() {
@@ -16,7 +16,7 @@ function Navigation() {
   return (
     <NavigationContainer>
       {!auth.isSignedIn && <StackAuthentication />}
-      {auth.isSignedIn && <StackNavigator />}
+      {auth.isSignedIn && <StackMain />}
     </NavigationContainer>
   );
 }

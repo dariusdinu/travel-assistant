@@ -3,7 +3,7 @@ import { useState } from "react";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import Colors from "../styles/colors";
 
-export default function DateInput() {
+export default function DateInput({ label, enteredDate }) {
   const [date, setDate] = useState(new Date());
 
   const onChange = (event, selectedDate) => {
@@ -24,13 +24,12 @@ export default function DateInput() {
     showMode("date");
   };
 
-  const time = date?.getTime();
   return (
     <>
-      <Text>Your birthday</Text>
+      <Text>{label}</Text>
       <Pressable onPress={showDatepicker}>
         <View>
-          <Text style={styles.buttonText}>{date.toDateString()}</Text>
+          <Text style={styles.buttonText}>{enteredDate}</Text>
         </View>
       </Pressable>
     </>

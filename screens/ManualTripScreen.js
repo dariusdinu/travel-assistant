@@ -1,9 +1,10 @@
 import { View, Text } from "react-native";
+import ManualTripForm from "../components/ManualTripForm";
 
 function ManualTrip() {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Trip Planning Options</Text>
+    <View>
+      <ManualTripForm />
     </View>
   );
 }
