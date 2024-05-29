@@ -20,17 +20,16 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 20,
+    borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: "orange",
-    marginBottom: 10,
+    backgroundColor: Colors.accent,
   },
-  pressed: { opacity: 0.6 },
+  pressed: { opacity: 0.8 },
   buttonText: {
     textAlign: "center",
-    color: "black",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: Colors.textLight,
+    fontSize: 20,
+    fontFamily: "Quicksand-Bold",
   },
 });

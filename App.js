@@ -1,5 +1,3 @@
-import "react-native-gesture-handler";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
@@ -9,6 +7,7 @@ import { StyleSheet, View } from "react-native";
 import StackAuthentication from "./navigation/StackAuthentication";
 import StackMain from "./navigation/StackMain";
 import AuthContextProvider, { AuthContext } from "./store/AuthContext";
+import { useFonts } from "expo-font";
 
 function Navigation() {
   const auth = useContext(AuthContext);
@@ -26,6 +25,13 @@ SplashScreen.preventAutoHideAsync();
 function Root() {
   const [appIsReady, setAppIsReady] = useState(false);
   const auth = useContext(AuthContext);
+  const [fontsLoaded, fontError] = useFonts({
+    "Quicksand-Regular": require("./assets/fonts/Quicksand-Regular.ttf"),
+    "Quicksand-Medium": require("./assets/fonts/Quicksand-Medium.ttf"),
+    "Quicksand-Light": require("./assets/fonts/Quicksand-Light.ttf"),
+    "Quicksand-SemiBold": require("./assets/fonts/Quicksand-SemiBold.ttf"),
+    "Quicksand-Bold": require("./assets/fonts/Quicksand-Bold.ttf"),
+  });
 
   useEffect(() => {
     async function prepare() {
@@ -45,12 +51,12 @@ function Root() {
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
+    if (appIsReady && (fontsLoaded || fontError)) {
       await SplashScreen.hideAsync();
     }
-  }, [appIsReady]);
+  }, [appIsReady, fontsLoaded, fontError]);
 
-  if (!appIsReady) {
+  if (!appIsReady || (!fontsLoaded && !fontError)) {
     return null;
   }
 

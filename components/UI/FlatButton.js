@@ -26,6 +26,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     textAlign: "center",
-    color: "orange",
+    color: Colors.textDark3,
+    fontFamily: "Quicksand-Regular",
+    fontSize: 12,
+    textDecorationLine: "underline",
   },
 });

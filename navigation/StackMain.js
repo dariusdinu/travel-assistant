@@ -11,7 +11,6 @@ export default function StackMain() {
         component={MainScreen}
         options={{
           headerShown: false,
-          // animationTypeForReplace: "pop",
         }}
       />
     </Stack.Navigator>

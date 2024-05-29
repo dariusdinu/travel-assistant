@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import DateInput from "../DateInput";
 import { Button, Input } from "../UI";
+import Colors from "../../styles/colors";
 
 function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
   const inputFirstNameRef = useRef(null);
@@ -68,6 +69,7 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
       <View>
         {!isLogin && (
           <>
+            <Text style={styles.titleCreateAccount}>Create your account</Text>
             <Input
               blurOnSubmit={false}
               isInvalid={credentialsInvalid.firstName}
@@ -110,11 +112,17 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
             />
           </>
         )}
+        {isLogin && (
+          <>
+            <Text style={styles.title}>Welcome back, traveler!</Text>
+            <Text style={styles.subTitle}>Log in and start exploring</Text>
+          </>
+        )}
         <Input
           blurOnSubmit={false}
           isInvalid={credentialsInvalid.email}
           keyboardType="email-address"
-          label="Adresă Email"
+          label="Email address"
           onSubmitEditing={() => {
             if (!isLogin) {
               inputConfirmEmailRef.current.focus();
@@ -123,7 +131,7 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
             }
           }}
           onUpdateValue={(value) => handleInputValueUpdate("email", value)}
-          placeholder="Adresă Email"
+          placeholder="Enter your email address"
           ref={inputEmailRef}
           returnKeyType="next"
           value={enteredEmail}
@@ -147,7 +155,7 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
         <Input
           blurOnSubmit={!!isLogin}
           isInvalid={credentialsInvalid.password}
-          label="Parolă"
+          label="Password"
           onSubmitEditing={() => {
             if (!isLogin) {
               inputConfirmPasswordRef.current.focus();
@@ -179,7 +187,7 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
         )}
         <View style={styles.buttons}>
           <Button onPress={() => handleFormSubmit()}>
-            {isLogin ? "Autentificare" : "Înregistrare"}
+            {isLogin ? "Log in" : "Sign up"}
           </Button>
         </View>
       </View>
@@ -195,5 +203,23 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginTop: 12,
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: "Quicksand-Bold",
+  },
+  titleCreateAccount: {
+    fontSize: 32,
+    fontFamily: "Quicksand-Bold",
+    marginTop: 40,
+    marginBottom: 20,
+    color: Colors.textDark1,
+  },
+  subTitle: {
+    fontSize: 16,
+    marginBottom: 32,
+    marginTop: 8,
+    fontFamily: "Quicksand-Medium",
+    letterSpacing: -0.2,
   },
 });

@@ -26,7 +26,7 @@ export default function DateInput({ label, enteredDate }) {
 
   return (
     <>
-      <Text>{label}</Text>
+      <Text style={styles.label}>{label}</Text>
       <Pressable onPress={showDatepicker}>
         <View>
           <Text style={styles.buttonText}>{enteredDate}</Text>
@@ -40,11 +40,16 @@ const styles = StyleSheet.create({
   buttonText: {
     flex: 1,
     paddingVertical: 8,
-    paddingHorizontal: 6,
+    paddingHorizontal: 16,
     fontSize: 16,
+    fontFamily: "Quicksand-Regular",
+    backgroundColor: Colors.background,
+    borderRadius: 50,
     marginVertical: 8,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 4,
+    color: Colors.textLight2,
+  },
+  label: {
+    fontFamily: "Quicksand-Medium",
+    marginTop: 4,
   },
 });

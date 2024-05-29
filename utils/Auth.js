@@ -2,7 +2,7 @@ import axios from "axios";
 
 async function authenticate(
   mode,
-  { firstName, lastName, birthDate, email, password },
+  { firstName, lastName, birthDate, email, password }
 ) {
   try {
     const apiUrl = process.env.EXPO_PUBLIC_API_URL;

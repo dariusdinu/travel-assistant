@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import {
   AITripScreen,
+  AddAStopScreen,
   ManualTripScreen,
   TripPlanningOptionsScreen,
 } from "../screens";
@@ -27,6 +28,13 @@ export default function StackTripPlanning() {
       <Stack.Screen
         name="AITrip"
         component={AITripScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="AddAStop"
+        component={AddAStopScreen}
         options={{
           headerShown: false,
         }}

@@ -8,7 +8,6 @@ import {
   View,
 } from "react-native";
 import Colors from "../../styles/colors";
-
 const Input = forwardRef(
   (
     {
@@ -58,7 +57,7 @@ const Input = forwardRef(
               <Ionicons
                 name={isSecureEntry ? "eye-off" : "eye"}
                 size={24}
-                color={Colors.text}
+                color={Colors.textLight2}
               />
             </TouchableOpacity>
           )}
@@ -76,26 +75,29 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 4,
+    fontFamily: "Quicksand-Medium",
   },
   labelInvalid: {
-    color: Colors.accent,
+    color: Colors.error,
   },
   inputSection: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Colors.background,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 50,
   },
   input: {
     flex: 1,
     paddingVertical: 8,
-    paddingHorizontal: 6,
+    paddingHorizontal: 16,
     fontSize: 16,
+    fontFamily: "Quicksand-Regular",
+    color: Colors.textLight2,
   },
   inputInvalid: {
-    borderColor: Colors.accent,
+    borderWidth: 1,
+    borderRadius: 50,
+    borderColor: Colors.error,
   },
   icon: {
     padding: 10,

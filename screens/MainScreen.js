@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "../store/AuthContext";
 import TabNavigator from "../navigation/TabNavigator";
 import { FlatButton } from "../components/UI";
+import ImagePickerComponent from "../components/ImagePickerComponent";
 
 export default function MainScreen() {
   const navigation = useNavigation();
@@ -13,13 +14,16 @@ export default function MainScreen() {
   return (
     <TabNavigator>
       <View style={styles.container}>
-        <Image
+        {/* <Image
           source={require("../assets/travel-icon.png")}
           style={styles.image}
-        />
-        <FlatButton>
+        /> */}
+        <View style={{ width: 200, height: 200, backgroundColor: "red" }}>
+          <ImagePickerComponent />
+        </View>
+        {/* <FlatButton>
           <Text onPress={auth.signOut}>Exit the app</Text>
-        </FlatButton>
+        </FlatButton> */}
         <Text>Welcome back, traveler!</Text>
       </View>
     </TabNavigator>

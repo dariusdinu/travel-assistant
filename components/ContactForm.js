@@ -2,6 +2,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import ContactService from "../services/ContactService";
 import { Button } from "./UI";
+import Colors from "../styles/colors";
 
 function ContactForm({ centerId }) {
   const {
@@ -25,7 +26,7 @@ function ContactForm({ centerId }) {
     } catch (error) {
       Alert.alert(
         "Error",
-        error.message || "There was an error sending your message.",
+        error.message || "There was an error sending your message."
       );
       console.error("Submission error", error);
     }
