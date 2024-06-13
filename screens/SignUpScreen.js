@@ -18,14 +18,14 @@ function SignUpScreen() {
   }) {
     setIsAuthenticating(true);
     try {
-      const token = await signUp({
+      const { token, user } = await signUp({
         firstName,
         lastName,
         birthDate,
         email,
         password,
       });
-      await auth.authenticate(token);
+      await auth.authenticate(token, user);
     } catch (error) {
       Alert.alert("Înregistrare eșuată", error.message);
       setIsAuthenticating(false);

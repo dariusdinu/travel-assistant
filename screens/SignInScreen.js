@@ -1,13 +1,5 @@
 import { useContext, useState } from "react";
-import {
-  StyleSheet,
-  Button,
-  Text,
-  View,
-  Pressable,
-  Touchable,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { AuthContent } from "../components/Auth";
 import { LoadingOverlay } from "../components/UI";
 import { AuthContext } from "../store/AuthContext";
@@ -29,8 +21,8 @@ function SignInScreen() {
   async function handleSignIn({ email, password }) {
     setIsAuthenticating(true);
     try {
-      const token = await signInWithPassword(email, password);
-      await auth.authenticate(token);
+      const { token, user } = await signInWithPassword(email, password);
+      await auth.authenticate(token, user);
     } catch (error) {
       setErrorMessage(error.message);
       setIsAuthenticating(false);
@@ -55,7 +47,9 @@ function SignInScreen() {
         animationOut={"slideOutUp"}
       >
         <View style={styles.modalContainer}>
-          <View>{iconGenerator(true, "alert-circle-outline")}</View>
+          <View>
+            {iconGenerator("alert-circle-outline", 13, Colors.textDark1)}
+          </View>
           <Text style={styles.modalText}>{errorMessage}</Text>
           <TouchableOpacity onPress={toggleModal}>
             <Text style={styles.modalButtonText}>CLOSE </Text>

@@ -4,7 +4,7 @@
     "slug": "travel-assistant",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo-white-black.jpg",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash-screen.png",

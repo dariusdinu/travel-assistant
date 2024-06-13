@@ -121,7 +121,7 @@ function AuthContent({ isLogin, onAuthenticate }) {
               {iconNames.map((item) => {
                 return (
                   <View key={item} style={styles.socialMediaIcon}>
-                    {iconGenerator(true, item)}
+                    {iconGenerator(item, 27, Colors.accent)}
                   </View>
                 );
               })}

@@ -21,7 +21,6 @@ const Input = forwardRef(
       placeholder,
       returnKeyType,
       secure = false,
-      inputMode = "text",
       value,
     },
     ref
@@ -47,7 +46,6 @@ const Input = forwardRef(
             secureTextEntry={isSecureEntry}
             style={[styles.input, isInvalid && styles.inputInvalid]}
             value={value}
-            inputMode={inputMode}
           />
           {secure && (
             <TouchableOpacity
@@ -75,7 +73,8 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 4,
-    fontFamily: "Quicksand-Medium",
+    fontFamily: "Quicksand-SemiBold",
+    fontSize: 14,
   },
   labelInvalid: {
     color: Colors.error,

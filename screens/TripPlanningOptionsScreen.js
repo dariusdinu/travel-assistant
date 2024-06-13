@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../styles/colors";
+import { AuthContext } from "../store/AuthContext";
 
 function TripPlanningOptions({ navigation }) {
+  const auth = useContext(AuthContext);
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Start a new adventure</Text>
@@ -39,7 +41,9 @@ function TripPlanningOptions({ navigation }) {
       <View style={[styles.card, styles.bottomCard]}>
         <TouchableOpacity
           style={styles.cardContent}
-          onPress={() => navigation.navigate("ManualTrip")}
+          onPress={() =>
+            navigation.navigate("ManualTrip", { userId: auth.user })
+          }
         >
           <View style={styles.textContainer}>
             <Text style={styles.cardTitle}>Trip Designer</Text>

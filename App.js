@@ -1,13 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import StackAuthentication from "./navigation/StackAuthentication";
 import StackMain from "./navigation/StackMain";
 import AuthContextProvider, { AuthContext } from "./store/AuthContext";
-import { useFonts } from "expo-font";
 
 function Navigation() {
   const auth = useContext(AuthContext);
@@ -37,8 +37,9 @@ function Root() {
     async function prepare() {
       try {
         const token = await AsyncStorage.getItem("token");
-        if (token) {
-          await auth.authenticate(token);
+        const userData = await AsyncStorage.getItem("user");
+        if (token && userData) {
+          await auth.authenticate(token, userData);
         }
       } catch (e) {
         console.warn(e);

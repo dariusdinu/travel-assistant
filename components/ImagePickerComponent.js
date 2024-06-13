@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import {
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-  Image,
-} from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, Image } from "react-native";
 import Colors from "../styles/colors";
 
-export default function ImagePickerComponent({ isProfile }) {
+export default function ImagePickerComponent({ isProfile, onImagePicked }) {
   const [file, setFile] = useState(null);
-  const [error, setError] = useState(null);
-
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -25,13 +16,14 @@ export default function ImagePickerComponent({ isProfile }) {
     } else {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false, // Disable editing to prevent cropping
+        allowsEditing: false,
         quality: 1,
       });
 
       if (!result.canceled) {
-        setFile(result.assets[0].uri);
-        setError(null);
+        const pickedImage = result.assets[0].uri;
+        setFile(pickedImage);
+        onImagePicked(pickedImage);
       }
     }
   };

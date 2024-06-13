@@ -108,7 +108,7 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
             />
             <DateInput
               label="When is your birthday?"
-              enteredDate={enteredBirthDate.toDateString()}
+              value={enteredBirthDate}
             />
           </>
         )}

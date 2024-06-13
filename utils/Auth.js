@@ -14,8 +14,8 @@ async function authenticate(
       email,
       password,
     });
-    const { idToken } = response.data;
-    return idToken;
+    const { idToken, localId } = response.data;
+    return { token: idToken, user: localId };
   } catch (error) {
     if (error.response) {
       throw new Error(error.response.data.message);

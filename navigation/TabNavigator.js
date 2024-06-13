@@ -49,7 +49,13 @@ const TabButton = (props) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={styles.container}>
-        <View style={styles.btn}>{iconGenerator(focused, item.iconName)}</View>
+        <View style={styles.btn}>
+          {iconGenerator(
+            item.iconName,
+            27,
+            focused ? Colors.accent : Colors.textLight2
+          )}
+        </View>
         <Text style={!focused ? styles.text : styles.activeText}>
           {item.label}
         </Text>

@@ -1,5 +1,5 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Pressable, StyleSheet } from "react-native";
+import iconGenerator from "../../utils/IconGenerator";
 
 function IconButton({ icon, color, size, onPress }) {
   return (
@@ -7,7 +7,7 @@ function IconButton({ icon, color, size, onPress }) {
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
       onPress={onPress}
     >
-      <Ionicons name={icon} color={color} size={size} />
+      {iconGenerator(icon, size, color)}
     </Pressable>
   );
 }

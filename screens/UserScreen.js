@@ -1,54 +1,102 @@
-import React, { useContext, useState } from "react";
-import { Text, View, Image, Pressable, ScrollView } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  Pressable,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { AuthContext } from "../store/AuthContext";
 import ImagePickerComponent from "../components/ImagePickerComponent";
-import { FlatButton } from "../components/UI";
+import { IconButton } from "../components/UI";
 import { StyleSheet } from "react-native";
 import Colors from "../styles/colors";
-import iconGenerator from "../utils/IconGenerator";
+import axios from "axios";
+import TripComponent from "../components/TripComponent";
 
-const trips = [
-  {
-    id: "1",
-    destination: "Florence",
-    dateRange: "Jul 5 - Jul 9",
-    image: require("../assets/empty-picture.png"), // Replace with your image path
-  },
-  {
-    id: "2",
-    destination: "Vienna",
-    dateRange: "Aug 13 - Aug 26",
-    image: require("../assets/empty-picture.png"), // Replace with your image path
-  },
-  {
-    id: "3",
-    destination: "Madrid",
-    dateRange: "Sep 13 - Sep 17",
-    image: require("../assets/empty-picture.png"), // Replace with your image path
-  },
-];
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+async function fetchUserDetails(userId) {
+  try {
+    const response = await axios.get(`${apiUrl}/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch user details:", error);
+    return null;
+  }
+}
+
+async function fetchTripsByUserId(userId) {
+  try {
+    const response = await axios.get(`${apiUrl}/trips`);
+    const userTrips = response.data.filter((trip) => trip.userId === userId);
+    return userTrips;
+  } catch (error) {
+    console.error("Error fetching trips:", error);
+    throw error;
+  }
+}
 
 function UserScreen() {
   const auth = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("Upcoming");
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState(null);
+
+  useEffect(() => {
+    async function loadUserDetails() {
+      const userId = auth.user;
+      const userData = await fetchUserDetails(userId);
+      setUserDetails(userData);
+    }
+
+    async function loadTrips() {
+      const userId = auth.user;
+      try {
+        const fetchedTrips = await fetchTripsByUserId(userId);
+        setTrips(fetchedTrips);
+      } catch (error) {
+        console.error("Error loading trips:", error);
+        Alert.alert("Error", "Failed to load trips");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadUserDetails();
+    loadTrips();
+  }, [auth.user]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.profileSection}>
-        <View style={styles.profileSection}>
-          <View style={styles.rounded}>
-            <ImagePickerComponent
-              isProfile={true}
-              defaultImage={require("../assets/empty-profile-picture.png")}
-            />
-          </View>
+        <View style={styles.rounded}>
+          <ImagePickerComponent
+            isProfile={true}
+            defaultImage={require("../assets/empty-profile-picture.png")}
+          />
         </View>
-        <Text style={styles.profileName}>John Example</Text>
-        <FlatButton>
-          <Text onPress={auth.signOut}>
-            {iconGenerator(true, "exit-outline")} Exit
+        {userDetails && (
+          <Text style={styles.profileName}>
+            {userDetails.firstName} {userDetails.lastName}
           </Text>
-        </FlatButton>
+        )}
+        <IconButton
+          onPress={auth.signOut}
+          icon={"exit-outline"}
+          color={Colors.accent}
+          size={27}
+        />
       </View>
 
       {/* Tabs */}
@@ -82,15 +130,11 @@ function UserScreen() {
 
       {/* Trip Cards */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {trips.map((trip) => (
-          <View key={trip.id} style={styles.tripCard}>
-            <Image source={trip.image} style={styles.tripImage} />
-            <View style={styles.tripInfo}>
-              <Text style={styles.tripDestination}>{trip.destination}</Text>
-              <Text style={styles.tripDateRange}>{trip.dateRange}</Text>
-            </View>
-          </View>
-        ))}
+        {trips.length === 0 ? (
+          <Text>No trips found</Text>
+        ) : (
+          trips.map((trip) => <TripComponent key={trip._id} trip={trip} />)
+        )}
       </ScrollView>
     </View>
   );
@@ -98,7 +142,7 @@ function UserScreen() {
 
 export default UserScreen;
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primary,
@@ -110,11 +154,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
     justifyContent: "space-between",
-  },
-  profileImage: {
-    width: 10,
-    height: 10,
-    borderRadius: 40,
   },
   profileName: {
     fontSize: 24,
@@ -139,28 +178,6 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingBottom: 80, // Add padding to ensure content is above the TabBar
-  },
-  tripCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    marginBottom: 16,
-    overflow: "hidden",
-  },
-  tripImage: {
-    width: "100%",
-    height: 200,
-  },
-  tripInfo: {
-    padding: 16,
-  },
-  tripDestination: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#161717",
-  },
-  tripDateRange: {
-    fontSize: 14,
-    color: "#A0A0A0",
   },
   rounded: {
     width: 80,
