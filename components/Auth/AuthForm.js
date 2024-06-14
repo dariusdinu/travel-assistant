@@ -199,7 +199,7 @@ export default AuthForm;
 
 const styles = StyleSheet.create({
   form: {
-    margin: 20,
+    margin: 22,
   },
   buttons: {
     marginTop: 12,

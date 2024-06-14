@@ -7,6 +7,7 @@ import iconGenerator from "../utils/IconGenerator";
 import Colors from "../styles/colors";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { View } from "react-native";
+import TabBarTrips from "./TabBarTrips";
 
 const Tab = createBottomTabNavigator();
 

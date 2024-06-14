@@ -3,7 +3,6 @@ import {
   Text,
   View,
   StyleSheet,
-  FlatList,
   TextInput,
   TouchableOpacity,
   Alert,
@@ -85,12 +84,6 @@ function ManualTripScreen() {
     createAndLoadTrip();
   }, []);
 
-  // useEffect(() => {
-  //   if (route.params.stopId) {
-  //     loadStops();
-  //   }
-  // }, [route.params.stopId]);
-
   const loadStops = async () => {
     if (tripId) {
       try {
@@ -118,7 +111,7 @@ function ManualTripScreen() {
       const details = {
         title,
         dateRange,
-        image,
+        coverPhoto: image,
       };
       await updateTripDetails(tripId, details);
       Alert.alert("Success", "Trip details updated successfully");
@@ -127,6 +120,16 @@ function ManualTripScreen() {
       });
     } catch (error) {
       Alert.alert("Error", "Failed to update trip details");
+    }
+  };
+
+  const handleImagePicked = async (imageUrl) => {
+    setImage(imageUrl);
+    try {
+      await updateTripDetails(tripId, { coverPhoto: imageUrl });
+    } catch (error) {
+      console.error("Error updating trip cover photo:", error);
+      Alert.alert("Error", "Failed to update trip cover photo");
     }
   };
 
@@ -143,7 +146,11 @@ function ManualTripScreen() {
         placeholder="Trip Title"
       />
       <View style={styles.headerContainer}>
-        <ImagePickerComponent isProfile={false} onImagePicked={setImage} />
+        <ImagePickerComponent
+          type="trip"
+          defaultImage={require("../assets/empty-picture.png")}
+          onImagePicked={handleImagePicked}
+        />
         <View style={styles.headerTextContainer}>
           <Text style={styles.dateLabel}>Start Date</Text>
           <TouchableOpacity

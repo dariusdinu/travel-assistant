@@ -14,6 +14,7 @@ import { StyleSheet } from "react-native";
 import Colors from "../styles/colors";
 import axios from "axios";
 import TripComponent from "../components/TripComponent";
+import TabBarTrips from "../navigation/TabBarTrips";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -23,7 +24,7 @@ async function fetchUserDetails(userId) {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch user details:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -47,14 +48,19 @@ function UserScreen() {
 
   useEffect(() => {
     async function loadUserDetails() {
-      const userId = auth.user;
-      const userData = await fetchUserDetails(userId);
-      setUserDetails(userData);
+      try {
+        const userId = auth.user;
+        const userData = await fetchUserDetails(userId);
+        setUserDetails(userData);
+      } catch (error) {
+        console.error("Error loading user details:", error);
+        Alert.alert("Error", "Failed to load user details");
+      }
     }
 
     async function loadTrips() {
-      const userId = auth.user;
       try {
+        const userId = auth.user;
         const fetchedTrips = await fetchTripsByUserId(userId);
         setTrips(fetchedTrips);
       } catch (error) {
@@ -65,9 +71,28 @@ function UserScreen() {
       }
     }
 
-    loadUserDetails();
-    loadTrips();
+    if (auth.user) {
+      loadUserDetails();
+      loadTrips();
+    }
   }, [auth.user]);
+
+  const handleImagePicked = async (imageUrl) => {
+    try {
+      const userId = auth.user;
+      const existingUserDetails = await fetchUserDetails(userId);
+      const updatedDetails = {
+        ...existingUserDetails,
+        profilePicture: imageUrl,
+      };
+
+      await axios.put(`${apiUrl}/users/${userId}`, updatedDetails);
+      setUserDetails(updatedDetails);
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+      Alert.alert("Error", "Failed to update profile picture");
+    }
+  };
 
   if (loading) {
     return (
@@ -82,8 +107,13 @@ function UserScreen() {
       <View style={styles.profileSection}>
         <View style={styles.rounded}>
           <ImagePickerComponent
-            isProfile={true}
-            defaultImage={require("../assets/empty-profile-picture.png")}
+            type="profile"
+            defaultImage={
+              userDetails && userDetails.profilePicture
+                ? { uri: userDetails.profilePicture }
+                : require("../assets/empty-profile-picture.png")
+            }
+            onImagePicked={handleImagePicked}
           />
         </View>
         {userDetails && (
@@ -99,43 +129,7 @@ function UserScreen() {
         />
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <Pressable onPress={() => setActiveTab("Active")}>
-          <Text
-            style={
-              activeTab === "Active" ? styles.activeTab : styles.inactiveTab
-            }
-          >
-            Active
-          </Text>
-        </Pressable>
-        <Pressable onPress={() => setActiveTab("Upcoming")}>
-          <Text
-            style={
-              activeTab === "Upcoming" ? styles.activeTab : styles.inactiveTab
-            }
-          >
-            Upcoming
-          </Text>
-        </Pressable>
-        <Pressable onPress={() => setActiveTab("Past")}>
-          <Text
-            style={activeTab === "Past" ? styles.activeTab : styles.inactiveTab}
-          >
-            Past
-          </Text>
-        </Pressable>
-      </View>
-
-      {/* Trip Cards */}
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {trips.length === 0 ? (
-          <Text>No trips found</Text>
-        ) : (
-          trips.map((trip) => <TripComponent key={trip._id} trip={trip} />)
-        )}
-      </ScrollView>
+      <TabBarTrips trips={trips} />
     </View>
   );
 }
