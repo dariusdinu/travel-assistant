@@ -1,24 +1,24 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import AITripForm from "../components/AITripForm";
 import Colors from "../styles/colors";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../store/AuthContext";
+import { LoadingOverlay } from "../components/UI";
 
 async function createStop(stopData, tripId) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const url = `${apiUrl}/stops`;
   const stop = { ...stopData, tripId };
-  console.log("stop", stop);
   const response = await axios.post(url, stop);
-  console.log(response.data);
+
   return response.data._id;
 }
 
 async function createTripFromAPIResponse(userId, generatedTrip) {
   const { startDate, endDate, stops } = generatedTrip;
-  console.log("generatedTrip: ", generatedTrip);
+
   const trip = {
     userId,
     type: "generated",
@@ -36,13 +36,12 @@ async function createTripFromAPIResponse(userId, generatedTrip) {
     const tripUrl = `${apiUrl}/trips`;
     const tripResponse = await axios.post(tripUrl, trip);
     const tripId = tripResponse.data._id;
-    console.log("tripId: ", tripId);
+
     const stopPromises = stops.map((stopData) => createStop(stopData, tripId));
     const stopIds = await Promise.all(stopPromises);
 
-    trip.stops = stopIds; // Update the trip's stops array with the created stop ObjectIds
+    trip.stops = stopIds;
 
-    // Update the trip with the stop references
     await axios.put(`${tripUrl}/${tripId}`, trip);
 
     return tripResponse.data;
@@ -55,11 +54,15 @@ async function createTripFromAPIResponse(userId, generatedTrip) {
 export default function AiTripScreen() {
   const navigation = useNavigation();
   const auth = useContext(AuthContext);
-  const userId = auth.user; // Get the user ID from context or props
+  const userId = auth.user;
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentTripPlace, setCurrentTripPlace] = useState("");
+
   const handleFormSubmit = async (formData) => {
     // prettier-ignore
     const prompt = `Generate a trip plan for a traveler with the following details: Place: ${formData.place} Arrival Date: ${formData.arrivalDate.toDateString()} Leave Date: ${formData.leaveDate.toDateString()} Number of Stops: ${formData.stops} Traveling Style: ${formData.travelingStyle} Main Interests: ${formData.mainInterests.join(", ")} Special Requirements: ${formData.specialRequirements.join(", ")} Outside Place: ${formData.outsidePlace ? "Yes" : "No"} Please format the response as a JSON object with the following structure: {"trip":{"title":"Trip to ${formData.place}","startDate":"${formData.arrivalDate.toISOString()}","endDate":"${formData.leaveDate.toISOString()}","stops":[{"place":"[Stop Place]","address":"[Stop Address]","arrivalTime":"[Stop Arrival Time]","website":"[Stop Website]"}]}}"`;
-
+    setCurrentTripPlace(formData.place);
+    setIsLoading(true);
     try {
       const apiUrl = process.env.EXPO_PUBLIC_API_URL;
       const url = `${apiUrl}/completions`;
@@ -77,26 +80,37 @@ export default function AiTripScreen() {
     } catch (error) {
       console.error("Error generating trip:", error);
       Alert.alert("Error", "Failed to generate trip 1");
+      setIsLoading(false);
     }
   };
 
   const saveGeneratedTrip = async (generatedTrip) => {
     try {
       const trip = await createTripFromAPIResponse(userId, generatedTrip);
-      console.log("save trip:", trip);
       Alert.alert("Success", "Trip generated and saved successfully");
       navigation.navigate("TripPlanningOptions", {
         screen: "TripPlanningOptions",
       });
     } catch (error) {
       Alert.alert("Error", "Failed to save generated trip");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Tell us more about your trip</Text>
-      <AITripForm onSubmit={handleFormSubmit} />
+      {isLoading && (
+        <LoadingOverlay
+          message={`Your wish is my command!\n\nFinding best attractions in ${currentTripPlace}`}
+        />
+      )}
+      {!isLoading && (
+        <>
+          <Text style={styles.header}>Tell us more about your trip</Text>
+          <AITripForm onSubmit={handleFormSubmit} />
+        </>
+      )}
     </View>
   );
 }

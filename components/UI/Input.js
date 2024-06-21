@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import Colors from "../../styles/colors";
+
 const Input = forwardRef(
   (
     {
@@ -22,6 +23,8 @@ const Input = forwardRef(
       returnKeyType,
       secure = false,
       value,
+      multiline,
+      numberOfLines,
     },
     ref
   ) => {
@@ -46,6 +49,9 @@ const Input = forwardRef(
             secureTextEntry={isSecureEntry}
             style={[styles.input, isInvalid && styles.inputInvalid]}
             value={value}
+            placeholderTextColor={"lightgrey"}
+            multiline={multiline}
+            numberOfLines={numberOfLines}
           />
           {secure && (
             <TouchableOpacity

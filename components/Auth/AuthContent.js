@@ -138,9 +138,10 @@ export default AuthContent;
 const styles = StyleSheet.create({
   contentContainer: {
     padding: 8,
-    borderRadius: 25,
     backgroundColor: Colors.primary,
     position: "absolute",
+    borderTopEndRadius: 40,
+    borderTopLeftRadius: 40,
     bottom: 0,
     left: 0,
     right: 0,

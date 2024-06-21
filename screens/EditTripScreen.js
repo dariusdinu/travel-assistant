@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -9,15 +9,17 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
-import { Button, FlatButton } from "../components/UI";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { Button, FlatButton, IconButton } from "../components/UI";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ImagePickerComponent from "../components/ImagePickerComponent";
 import axios from "axios";
 import Colors from "../styles/colors";
 import iconGenerator from "../utils/IconGenerator";
-import StopCard from "../components/StopCard";
-import { AuthContext } from "../store/AuthContext";
+import StopList from "../components/StopList";
+import { schedulePushNotification } from "../utils/Notifications";
+import { formatDate } from "../utils/DateFormatter";
+import { LoadingOverlay } from "../components/UI";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -33,16 +35,14 @@ async function fetchStopsByTripId(tripId) {
   }
 }
 
-async function createTrip(userId) {
-  const url = `${apiUrl}/trips`;
+async function fetchTripById(tripId) {
+  const url = `${apiUrl}/trips/${tripId}`;
+
   try {
-    const response = await axios.post(url, {
-      userId,
-      type: "manual",
-    });
+    const response = await axios.get(url);
     return response.data;
   } catch (error) {
-    console.error("Error creating trip:", error);
+    console.error("Error fetching trip:", error);
     throw error;
   }
 }
@@ -68,8 +68,11 @@ async function deleteTrip(tripId) {
   }
 }
 
-function ManualTripScreen() {
+function EditTripScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { tripId } = route.params;
+
   const [stops, setStops] = useState([]);
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(new Date());
@@ -77,41 +80,38 @@ function ManualTripScreen() {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [image, setImage] = useState(null);
-  const [tripId, setTripId] = useState(null);
-  const auth = useContext(AuthContext);
-  const userId = auth.user;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function createAndLoadTrip() {
+    async function loadTrip() {
       try {
-        const trip = await createTrip(userId);
-        setTripId(trip._id);
-        const fetchedStops = await fetchStopsByTripId(trip._id);
-        setStops(fetchedStops);
-      } catch (error) {
-        console.error("Error initializing trip:", error);
-      }
-    }
-    createAndLoadTrip();
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (tripId) {
-        loadStops();
-      }
-    }, [tripId])
-  );
-
-  const loadStops = async () => {
-    if (tripId) {
-      try {
+        const trip = await fetchTripById(tripId);
+        setTitle(trip.title);
+        setStartDate(new Date(trip.dateRange.start));
+        setEndDate(new Date(trip.dateRange.end));
+        setImage(trip.coverPhoto);
         const fetchedStops = await fetchStopsByTripId(tripId);
         setStops(fetchedStops);
+        scheduleNotifications(fetchedStops);
+        setLoading(false);
       } catch (error) {
-        console.error("Error loading stops:", error);
+        console.error("Error loading trip:", error);
       }
     }
+    loadTrip();
+  }, [tripId]);
+
+  const scheduleNotifications = (stops) => {
+    stops.forEach((stop) => {
+      const arrivalTime = new Date(stop.arrivalTime);
+      schedulePushNotification(
+        `Upcoming Stop: ${stop.place}`,
+        `You have an upcoming stop at ${stop.place} on ${formatDate(
+          arrivalTime
+        )}`,
+        arrivalTime
+      );
+    });
   };
 
   const handleDateChange = (event, selectedDate, type) => {
@@ -134,35 +134,53 @@ function ManualTripScreen() {
       };
       await updateTripDetails(tripId, details);
       Alert.alert("Success", "Trip details updated successfully");
-      navigation.navigate("TripPlanningOptions", {
-        screen: "TripPlanningOptions",
-      });
+      navigation.goBack();
     } catch (error) {
       Alert.alert("Error", "Failed to update trip details");
     }
   };
 
-  const handleCancel = () => {
+  const handleDeleteTrip = async () => {
     Alert.alert(
-      "Cancel Trip Creation",
-      "Are you sure you want to cancel? This will delete the current trip.",
+      "Delete Trip",
+      "Are you sure you want to delete this trip?",
       [
-        { text: "No", style: "cancel" },
+        { text: "Cancel", style: "cancel" },
         {
-          text: "Yes",
+          text: "Delete",
           style: "destructive",
           onPress: async () => {
             try {
               await deleteTrip(tripId);
-              navigation.navigate("TripPlanningOptions");
+              Alert.alert("Success", "Trip deleted successfully");
+              navigation.goBack();
             } catch (error) {
               Alert.alert("Error", "Failed to delete trip");
             }
           },
         },
-      ]
+      ],
+      { cancelable: true }
     );
   };
+
+  const handleImagePicked = async (imageUrl) => {
+    setImage(imageUrl);
+    try {
+      await updateTripDetails(tripId, { coverPhoto: imageUrl });
+    } catch (error) {
+      console.error("Error updating trip cover photo:", error);
+      Alert.alert("Error", "Failed to update trip cover photo");
+    }
+  };
+
+  const handleUpdateStops = (updatedStops) => {
+    setStops(updatedStops);
+  };
+
+  if (loading) {
+    return <LoadingOverlay message="Loading trip details..." />;
+  }
 
   return (
     <View style={styles.container}>
@@ -173,7 +191,13 @@ function ManualTripScreen() {
         placeholder="Trip Title"
       />
       <View style={styles.headerContainer}>
-        <ImagePickerComponent isProfile={false} onImagePicked={setImage} />
+        <ImagePickerComponent
+          type="trip"
+          defaultImage={
+            image ? { uri: image } : require("../assets/empty-picture.png")
+          }
+          onImagePicked={handleImagePicked}
+        />
         <View style={styles.headerTextContainer}>
           <Text style={styles.dateLabel}>Start Date</Text>
           <TouchableOpacity
@@ -212,13 +236,11 @@ function ManualTripScreen() {
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.stopListContainer}>
-        {stops.length > 0 ? (
-          stops.map((stop) => <StopCard key={stop._id} stopInfo={stop} />)
-        ) : (
-          <Text style={styles.noStopsText}>No stops added yet</Text>
-        )}
+        <StopList stops={stops} onUpdate={handleUpdateStops} />
         <Pressable
-          onPress={() => navigation.navigate("AddAStop", { tripId })}
+          onPress={() =>
+            navigation.navigate("AddAStopScreen", { tripId, mode: "edit" })
+          }
           style={styles.button}
         >
           {iconGenerator("add-circle", 40, Colors.accent)}
@@ -226,9 +248,12 @@ function ManualTripScreen() {
         </Pressable>
         <View style={styles.buttonContainer}>
           <Button onPress={handleSaveTrip} color={Colors.accent} size={27}>
-            Save trip
+            Save edits
           </Button>
-          <FlatButton onPress={handleCancel} style={styles.button}>
+          <Button onPress={handleDeleteTrip} color={Colors.danger} size={27}>
+            Delete trip
+          </Button>
+          <FlatButton onPress={() => navigation.goBack()} style={styles.button}>
             <Text>Cancel</Text>
           </FlatButton>
         </View>
@@ -254,10 +279,10 @@ const styles = StyleSheet.create({
     height: 140,
   },
   titleInput: {
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: "bold",
     color: Colors.textDark1,
-    marginBottom: 10,
+    marginBottom: 20,
     marginHorizontal: 20,
   },
   datePicker: {
@@ -305,17 +330,19 @@ const styles = StyleSheet.create({
     fontFamily: "Quicksand-SemiBold",
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
     marginHorizontal: 20,
     gap: 10,
+    justifyContent: "space-around",
   },
   noStopsText: {
     fontFamily: "Quicksand-Regular",
     textAlign: "center",
-    marginVertical: 20,
+    marginVertical: 120,
     fontSize: 24,
   },
 });
 
-export default ManualTripScreen;
+export default EditTripScreen;

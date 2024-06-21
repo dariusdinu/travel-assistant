@@ -47,7 +47,7 @@ async function addAStopToDatabase({
 export default function AddAStopScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { tripId } = route.params;
+  const { tripId, mode } = route.params; // Destructure mode
 
   async function submitHandler(stopDetails) {
     let {
@@ -77,7 +77,11 @@ export default function AddAStopScreen() {
       });
       const stopId = stopData._id;
 
-      navigation.navigate("ManualTrip", { stopId });
+      if (mode === "edit") {
+        navigation.navigate("EditTrip", { tripId }); // Navigate back to EditTripScreen
+      } else {
+        navigation.navigate("ManualTrip", { stopId }); // Navigate to ManualTripScreen when creating a new trip
+      }
     } catch (error) {
       Alert.alert("Failed to add stop", error.message);
     }

@@ -1,23 +1,12 @@
 import * as React from "react";
-import { View, FlatList, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Colors from "../styles/colors";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { parseISO, isBefore, isAfter, isWithinInterval } from "date-fns";
-import TripComponent from "../components/TripComponent";
+import TripList from "../components/TripList";
+import { formatDate } from "../utils/DateFormatter";
 
-function TripList({ trips }) {
-  return (
-    <FlatList
-      data={trips}
-      keyExtractor={(item) => item._id}
-      renderItem={({ item }) => <TripComponent trip={item} />}
-    />
-  );
-}
-
-function Active({ trips }) {
+function Active({ trips, onTripPress }) {
   const now = new Date();
   const activeTrips = trips.filter((trip) =>
     isWithinInterval(now, {
@@ -26,42 +15,67 @@ function Active({ trips }) {
     })
   );
 
+  const upcomingTrips = trips.filter((trip) =>
+    isAfter(parseISO(trip.dateRange.start), now)
+  );
+
+  const nextTripDate = upcomingTrips.length
+    ? formatDate(upcomingTrips[0].dateRange.start)
+    : null;
+
+  const emptyMessage = nextTripDate
+    ? `Your next trip is set for ${nextTripDate}`
+    : "There aren't any active trips";
+
   return (
-    <View style={styles.tabContainer}>
-      <TripList trips={activeTrips} />
-    </View>
+    <TripList
+      trips={activeTrips}
+      onTripPress={onTripPress}
+      emptyMessage={emptyMessage}
+    />
   );
 }
 
-function Upcoming({ trips }) {
+function Upcoming({ trips, onTripPress }) {
   const now = new Date();
   const upcomingTrips = trips.filter((trip) =>
     isAfter(parseISO(trip.dateRange.start), now)
   );
 
+  const emptyMessage = upcomingTrips.length
+    ? "Your next trip is on " + formatDate(upcomingTrips[0].dateRange.start)
+    : "You have no upcoming trips. Start planning your new adventure";
+
   return (
-    <View style={styles.tabContainer}>
-      <TripList trips={upcomingTrips} />
-    </View>
+    <TripList
+      trips={upcomingTrips}
+      onTripPress={onTripPress}
+      emptyMessage={emptyMessage}
+    />
   );
 }
 
-function Past({ trips }) {
+function Past({ trips, onTripPress }) {
   const now = new Date();
   const pastTrips = trips.filter((trip) =>
     isBefore(parseISO(trip.dateRange.end), now)
   );
 
+  const emptyMessage =
+    "There aren't any past trips. Start planning your new adventure";
+
   return (
-    <View style={styles.tabContainer}>
-      <TripList trips={pastTrips} />
-    </View>
+    <TripList
+      trips={pastTrips}
+      onTripPress={onTripPress}
+      emptyMessage={emptyMessage}
+    />
   );
 }
 
 const Tab = createMaterialTopTabNavigator();
 
-function MyTabs({ trips }) {
+function MyTabs({ trips, onTripPress }) {
   return (
     <Tab.Navigator
       initialRouteName="Active"
@@ -87,23 +101,23 @@ function MyTabs({ trips }) {
         },
       }}
     >
-      <Tab.Screen name="Active">{() => <Active trips={trips} />}</Tab.Screen>
-      <Tab.Screen name="Upcoming">
-        {() => <Upcoming trips={trips} />}
+      <Tab.Screen name="Active">
+        {() => <Active trips={trips} onTripPress={onTripPress} />}
       </Tab.Screen>
-      <Tab.Screen name="Past ">{() => <Past trips={trips} />}</Tab.Screen>
+      <Tab.Screen name="Upcoming">
+        {() => <Upcoming trips={trips} onTripPress={onTripPress} />}
+      </Tab.Screen>
+      <Tab.Screen name="Past ">
+        {() => <Past trips={trips} onTripPress={onTripPress} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
 
-export default function TabBarTrips({ trips }) {
+export default function TabBarTrips({ trips, onTripPress }) {
   return (
-    <NavigationContainer independent={true} style={styles.bgred}>
-      <MyTabs trips={trips} />
+    <NavigationContainer independent={true}>
+      <MyTabs trips={trips} onTripPress={onTripPress} />
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  tabContainer: { backgroundColor: Colors.primary, flex: 1 },
-});

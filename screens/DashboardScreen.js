@@ -3,11 +3,12 @@ import { Text, View, StyleSheet, ScrollView } from "react-native";
 import { BarChart, PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import axios from "axios";
-import formatDate from "../utils/DateFormatter";
+import { formatDate } from "../utils/DateFormatter";
 import Colors from "../styles/colors";
 import * as Progress from "react-native-progress";
 import { differenceInDays, endOfYear } from "date-fns";
 import { Card } from "react-native-paper";
+import { LoadingOverlay } from "../components/UI";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -33,11 +34,7 @@ function DashboardScreen() {
   }, []);
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <LoadingOverlay message="Loading your dashboard..." />;
   }
 
   const totalTrips = trips.length;

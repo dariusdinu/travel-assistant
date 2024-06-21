@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button, Input } from "./UI";
 import { StyleSheet, Text, View, TextInput, ScrollView } from "react-native";
 import DateInput from "./DateInput";
@@ -6,26 +6,62 @@ import ImagePickerComponent from "./ImagePickerComponent";
 import Colors from "../styles/colors";
 import FilePickerComponent from "./FilePickerComponent";
 
-function StopForm({ onSubmit }) {
+function StopForm({ onSubmit, initialData, buttonText }) {
   const inputPlaceRef = useRef(null);
   const inputAddressRef = useRef(null);
   const inputWebsiteRef = useRef(null);
   const inputNotesRef = useRef(null);
 
-  const [enteredPlace, setEnteredPlace] = useState(
-    "https://www.google.com/maps/place/Teatro+alla+Scala"
-  );
+  const [enteredPlace, setEnteredPlace] = useState(initialData?.place || "");
   const [enteredAddress, setEnteredAddress] = useState(
-    "V. Filodrammatici, 2, 20121"
+    initialData?.address || ""
   );
-  const [enteredArrivalDate, setEnteredArrivalDate] = useState(new Date());
-  const [enteredArrivalTime, setEnteredArrivalTime] = useState(new Date());
+  const [enteredArrivalDate, setEnteredArrivalDate] = useState(
+    initialData?.arrivalDate ? new Date(initialData.arrivalDate) : new Date()
+  );
+  const [enteredArrivalTime, setEnteredArrivalTime] = useState(
+    initialData?.arrivalTime ? new Date(initialData.arrivalTime) : new Date()
+  );
   const [enteredWebsite, setEnteredWebsite] = useState(
-    "https://www.teatroallascala.org"
+    initialData?.website || ""
   );
-  const [enteredNotes, setEnteredNotes] = useState("These are my notes");
-  const [enteredImages, setEnteredImages] = useState([]);
-  const [enteredFiles, setEnteredFiles] = useState([]);
+  const [enteredNotes, setEnteredNotes] = useState(initialData?.notes || "");
+  const [enteredImages, setEnteredImages] = useState(initialData?.images || []);
+  const [enteredFiles, setEnteredFiles] = useState(
+    initialData?.additionalFiles || []
+  );
+
+  useEffect(() => {
+    if (initialData) {
+      setEnteredPlace(initialData.place);
+      setEnteredAddress(initialData.address);
+      setEnteredArrivalDate(new Date(initialData.arrivalTime));
+      setEnteredArrivalTime(new Date(initialData.arrivalTime));
+      setEnteredWebsite(initialData.website);
+      setEnteredNotes(initialData.notes);
+      setEnteredImages(initialData.images || []);
+      setEnteredFiles(initialData.additionalFiles || []);
+    }
+  }, [initialData]);
+
+  function handleInputValueUpdate(inputField, updatedValue) {
+    switch (inputField) {
+      case "place":
+        setEnteredPlace(updatedValue);
+        break;
+      case "address":
+        setEnteredAddress(updatedValue);
+        break;
+      case "website":
+        setEnteredWebsite(updatedValue);
+        break;
+      case "notes":
+        setEnteredNotes(updatedValue);
+        break;
+      default:
+        break;
+    }
+  }
 
   function handleFormSubmit() {
     const combinedDateTime = new Date(enteredArrivalDate);
@@ -35,7 +71,7 @@ function StopForm({ onSubmit }) {
     onSubmit({
       place: enteredPlace,
       address: enteredAddress,
-      arrivalTime: enteredArrivalTime,
+      arrivalTime: combinedDateTime.toISOString(),
       website: enteredWebsite,
       notes: enteredNotes,
       images: enteredImages,
@@ -64,44 +100,43 @@ function StopForm({ onSubmit }) {
       <Input
         label="Place"
         value={enteredPlace}
-        onChangeText={(text) => setEnteredPlace(text)}
-        placeholder="Teatro alla Scala"
+        onUpdateValue={(value) => handleInputValueUpdate("place", value)}
+        placeholder="Choose a place"
         ref={inputPlaceRef}
       />
       <Input
         label="Address"
         value={enteredAddress}
-        onChangeText={(text) => setEnteredAddress(text)}
-        placeholder="V. Filodrammatici, 2, 20121"
+        onUpdateValue={(value) => handleInputValueUpdate("address", value)}
+        placeholder="What is the address?"
         ref={inputAddressRef}
-      />
-      <DateInput
-        label="Arrival time"
-        value={enteredArrivalTime}
-        onChange={setEnteredArrivalTime}
-        mode="date"
       />
       <DateInput
         label="Arrival Date"
         value={enteredArrivalDate}
         onChange={setEnteredArrivalDate}
+        mode="date"
+      />
+      <DateInput
+        label="Arrival Time"
+        value={enteredArrivalTime}
+        onChange={setEnteredArrivalTime}
         mode="time"
       />
       <Input
         label="Website"
         value={enteredWebsite}
-        onChangeText={(text) => setEnteredWebsite(text)}
-        placeholder="teatroallascala.org"
+        onUpdateValue={(value) => handleInputValueUpdate("website", value)}
+        placeholder="Specify the website"
         ref={inputWebsiteRef}
       />
-      <Text style={styles.label}>Notes</Text>
-      <TextInput
-        style={styles.notesInput}
-        multiline={true}
+      <Input
+        label="Notes"
         numberOfLines={4}
         value={enteredNotes}
-        onChangeText={(text) => setEnteredNotes(text)}
-        placeholder="Enter your notes here"
+        multiline={true}
+        onUpdateValue={(value) => handleInputValueUpdate("notes", value)}
+        placeholder="Add important notes"
         ref={inputNotesRef}
       />
       <Text style={styles.label}>Images</Text>
@@ -123,7 +158,9 @@ function StopForm({ onSubmit }) {
         ))}
       </View>
       <Button onPress={handleFormSubmit} style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>Add stop to current trip</Text>
+        <Text style={styles.submitButtonText}>
+          {buttonText || "Add stop to current trip"}
+        </Text>
       </Button>
     </ScrollView>
   );
@@ -140,7 +177,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Quicksand-SemiBold",
     color: Colors.textDark1,
-    marginBottom: 8,
   },
   notesInput: {
     backgroundColor: Colors.background,

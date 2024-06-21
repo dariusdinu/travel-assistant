@@ -177,7 +177,7 @@ const AITripForm = ({ onSubmit }) => {
               onPress={() => toggleRequirement(requirement)}
             >
               {iconGenerator(
-                mainInterests.includes(requirement)
+                specialRequirements.includes(requirement)
                   ? "checkmark-circle"
                   : "ellipse-outline",
                 24,

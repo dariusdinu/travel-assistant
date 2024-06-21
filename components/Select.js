@@ -23,7 +23,7 @@ export default function Select({
               key={item.value}
               label={item.label}
               value={item.value}
-              style={styles.pickerItem} // Apply the item style here
+              style={styles.pickerItem}
             />
           ))}
         </Picker>

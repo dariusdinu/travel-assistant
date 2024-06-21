@@ -3,11 +3,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import StackAuthentication from "./navigation/StackAuthentication";
 import StackMain from "./navigation/StackMain";
 import AuthContextProvider, { AuthContext } from "./store/AuthContext";
+import { registerForPushNotificationsAsync } from "./utils/Notifications";
+import * as Notifications from "expo-notifications";
 
 function Navigation() {
   const auth = useContext(AuthContext);
@@ -69,6 +71,30 @@ function Root() {
 }
 
 export default function App() {
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        console.log(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
   return (
     <>
       <AuthContextProvider>

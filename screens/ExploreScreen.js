@@ -8,7 +8,6 @@ function ExploreScreen() {
   const [submittedQuery, setSubmittedQuery] = useState("");
 
   const handleSearchSubmit = () => {
-    console.log(searchQuery);
     if (searchQuery.length > 2) {
       setSubmittedQuery(searchQuery);
     } else {

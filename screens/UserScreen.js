@@ -15,6 +15,7 @@ import Colors from "../styles/colors";
 import axios from "axios";
 import TripComponent from "../components/TripComponent";
 import TabBarTrips from "../navigation/TabBarTrips";
+import { useNavigation } from "@react-navigation/native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -41,7 +42,7 @@ async function fetchTripsByUserId(userId) {
 
 function UserScreen() {
   const auth = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState("Upcoming");
+  const navigation = useNavigation();
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userDetails, setUserDetails] = useState(null);
@@ -94,6 +95,10 @@ function UserScreen() {
     }
   };
 
+  const handleTripPress = (tripId) => {
+    navigation.navigate("EditTrip", { tripId });
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -129,7 +134,7 @@ function UserScreen() {
         />
       </View>
 
-      <TabBarTrips trips={trips} />
+      <TabBarTrips trips={trips} onTripPress={handleTripPress} />
     </View>
   );
 }
@@ -153,25 +158,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#161717",
-  },
-  tabsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 16,
-  },
-  activeTab: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#161717",
-    borderBottomWidth: 2,
-    borderBottomColor: "#161717",
-  },
-  inactiveTab: {
-    fontSize: 16,
-    color: "#A0A0A0",
-  },
-  scrollContainer: {
-    paddingBottom: 80, // Add padding to ensure content is above the TabBar
   },
   rounded: {
     width: 80,

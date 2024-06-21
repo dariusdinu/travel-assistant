@@ -3,6 +3,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Alert, StyleSheet, TouchableOpacity, Image } from "react-native";
 import axios from "axios";
 import Colors from "../styles/colors";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export default function ImagePickerComponent({
   type,
@@ -29,10 +30,24 @@ export default function ImagePickerComponent({
 
       if (!result.canceled) {
         const pickedImage = result.assets[0].uri;
-        setFile(pickedImage);
-        const imageUrl = await uploadImageToSpaces(pickedImage);
+        const compressedImage = await compressImage(pickedImage);
+        setFile(compressedImage.uri);
+        const imageUrl = await uploadImageToSpaces(compressedImage.uri);
         onImagePicked(imageUrl);
       }
+    }
+  };
+
+  const compressImage = async (uri) => {
+    try {
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 800 } }],
+        { compress: 0.3, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      return manipulatedImage;
+    } catch (error) {
+      console.log("Error resizing image: ", error);
     }
   };
 
@@ -46,7 +61,7 @@ export default function ImagePickerComponent({
         type: "image/jpeg",
       });
 
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL; // Ensure this is set in your .env file
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL;
       const response = await axios.post(`${apiUrl}/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -54,7 +69,7 @@ export default function ImagePickerComponent({
       });
       const imageUrl = response.data.url;
       setFile(imageUrl);
-      Alert.alert("Upload Success", "Image uploaded successfully!");
+
       return imageUrl;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -94,8 +109,8 @@ export default function ImagePickerComponent({
 
 const styles = StyleSheet.create({
   imagePlaceholder: {
-    width: 80,
-    height: 80,
+    width: 130,
+    height: 130,
     backgroundColor: "#FFFAF6",
     justifyContent: "center",
     alignItems: "center",
@@ -107,12 +122,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 50,
   },
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 50,
+    borderRadius: 20,
   },
   profile: {
     width: "100%",

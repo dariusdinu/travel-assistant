@@ -1,12 +1,19 @@
 import React from "react";
-import { View, Text, ImageBackground, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import Colors from "../styles/colors";
-import formatDate from "../utils/DateFormatter";
+import { formatDate } from "../utils/DateFormatter";
 import { LinearGradient } from "expo-linear-gradient";
+import SparklesIcon from "../assets/sparkles.svg";
 
-function TripComponent({ trip }) {
+function TripComponent({ trip, onPress }) {
   return (
-    <View style={styles.tripCard}>
+    <TouchableOpacity style={styles.tripCard} onPress={() => onPress(trip._id)}>
       <ImageBackground
         source={{ uri: trip.coverPhoto }}
         resizeMode="cover"
@@ -22,9 +29,14 @@ function TripComponent({ trip }) {
               trip.dateRange.start
             )} - ${formatDate(trip.dateRange.end)}`}</Text>
           </View>
+          {trip.type === "generated" && (
+            <View style={styles.iconContainer}>
+              <SparklesIcon width={24} height={24} fill={Colors.textLight} />
+            </View>
+          )}
         </LinearGradient>
       </ImageBackground>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -33,7 +45,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     height: 200,
     borderRadius: 40,
-    marginBottom: 16,
+    marginBottom: 1,
     overflow: "hidden",
     marginVertical: 20,
   },
@@ -61,6 +73,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textLight,
     fontFamily: "Quicksand-SemiBold",
+  },
+  iconContainer: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    borderRadius: 12,
+    padding: 5,
   },
 });
 
