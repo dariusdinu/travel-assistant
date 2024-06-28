@@ -4,19 +4,15 @@ import { AuthContent } from "../components/Auth";
 import { LoadingOverlay } from "../components/UI";
 import { AuthContext } from "../store/AuthContext";
 import { signInWithPassword } from "../utils/Auth";
-import Modal from "react-native-modal";
 import Colors from "../styles/colors";
-import iconGenerator from "../utils/IconGenerator";
+import ModalWindow from "../components/UI/ModalWindow";
 
 function SignInScreen() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
   const auth = useContext(AuthContext);
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
 
   async function handleSignIn({ email, password }) {
     setIsAuthenticating(true);
@@ -24,7 +20,8 @@ function SignInScreen() {
       const { token, user } = await signInWithPassword(email, password);
       await auth.authenticate(token, user);
     } catch (error) {
-      setErrorMessage(error.message);
+      setModalMessage(error.message);
+      setModalIcon("alert-circle-outline");
       setIsAuthenticating(false);
       setModalVisible(true);
     }
@@ -36,26 +33,6 @@ function SignInScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => {
-          setModalVisible(false);
-        }}
-        animationIn={"slideInDown"}
-        animationInTiming={500}
-        animationOutTiming={600}
-        animationOut={"slideOutUp"}
-      >
-        <View style={styles.modalContainer}>
-          <View>
-            {iconGenerator("alert-circle-outline", 13, Colors.textDark1)}
-          </View>
-          <Text style={styles.modalText}>{errorMessage}</Text>
-          <TouchableOpacity onPress={toggleModal}>
-            <Text style={styles.modalButtonText}>CLOSE </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
       <AuthContent
         isLogin
         onAuthenticate={(credentials) => handleSignIn(credentials)}

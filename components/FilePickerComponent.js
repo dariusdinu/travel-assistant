@@ -19,6 +19,7 @@ export default function FilePickerComponent({ onFilePicked }) {
   return (
     <View>
       <TouchableOpacity style={styles.button} onPress={pickFile}>
+        {iconGenerator("document-outline", 24, Colors.accent)}
         <Text style={styles.buttonText}>
           Add additional files (QR codes, tickets, passes)
         </Text>
@@ -35,13 +36,17 @@ export default function FilePickerComponent({ onFilePicked }) {
 
 const styles = StyleSheet.create({
   button: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
     backgroundColor: Colors.primary,
     borderRadius: 8,
     marginBottom: 16,
   },
   buttonText: {
     color: Colors.textDark1,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     fontFamily: "Quicksand-SemiBold",
   },

@@ -1,35 +1,36 @@
-import React from "react";
-import { View, StyleSheet, Text, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, Text } from "react-native";
 import Colors from "../styles/colors";
 import StopCard from "./StopCard";
 import axios from "axios";
+import ModalWindow from "./UI/ModalWindow";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export default function StopList({ stops, onUpdate }) {
-  const handleDeleteStop = async (id) => {
-    Alert.alert(
-      "Delete Stop",
-      "Are you sure you want to delete this stop?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await axios.delete(`${apiUrl}/stops/${id}`);
-              const updatedStops = stops.filter((stop) => stop._id !== id);
-              onUpdate(updatedStops);
-            } catch (error) {
-              console.error("Error deleting stop:", error);
-              Alert.alert("Error", "Failed to delete stop.");
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
+  const [onModalConfirm, setOnModalConfirm] = useState(null);
+
+  const handleDeleteStop = (id) => {
+    setModalIcon("alert-circle-outline");
+    setModalMessage("Are you sure you want to delete this stop?");
+    setOnModalConfirm(() => async () => {
+      try {
+        await axios.delete(`${apiUrl}/stops/${id}`);
+        const updatedStops = stops.filter((stop) => stop._id !== id);
+        onUpdate(updatedStops);
+        setModalVisible(false);
+      } catch (error) {
+        console.error("Error deleting stop:", error);
+        setModalIcon("alert-circle-outline");
+        setModalMessage("Failed to delete stop.");
+        setOnModalConfirm(() => () => setModalVisible(false));
+        setModalVisible(true);
+      }
+    });
+    setModalVisible(true);
   };
 
   return (
@@ -45,6 +46,13 @@ export default function StopList({ stops, onUpdate }) {
       ) : (
         <Text style={styles.noStopsText}>No stops added yet</Text>
       )}
+      <ModalWindow
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        iconType={modalIcon}
+        message={modalMessage}
+        onConfirm={onModalConfirm}
+      />
     </View>
   );
 }

@@ -1,21 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  Text,
-  View,
-  Pressable,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import React, { useContext, useEffect, useState, useCallback } from "react";
+import { Text, View, ActivityIndicator, Alert, StyleSheet } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { AuthContext } from "../store/AuthContext";
 import ImagePickerComponent from "../components/ImagePickerComponent";
 import { IconButton } from "../components/UI";
-import { StyleSheet } from "react-native";
 import Colors from "../styles/colors";
 import axios from "axios";
-import TripComponent from "../components/TripComponent";
 import TabBarTrips from "../navigation/TabBarTrips";
-import { useNavigation } from "@react-navigation/native";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -47,36 +38,44 @@ function UserScreen() {
   const [loading, setLoading] = useState(true);
   const [userDetails, setUserDetails] = useState(null);
 
+  const loadUserDetails = async () => {
+    try {
+      const userId = auth.user;
+      const userData = await fetchUserDetails(userId);
+      setUserDetails(userData);
+    } catch (error) {
+      console.error("Error loading user details:", error);
+      Alert.alert("Error", "Failed to load user details");
+    }
+  };
+
+  const loadTrips = async () => {
+    try {
+      const userId = auth.user;
+      const fetchedTrips = await fetchTripsByUserId(userId);
+      setTrips(fetchedTrips);
+    } catch (error) {
+      console.error("Error loading trips:", error);
+      Alert.alert("Error", "Failed to load trips");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    async function loadUserDetails() {
-      try {
-        const userId = auth.user;
-        const userData = await fetchUserDetails(userId);
-        setUserDetails(userData);
-      } catch (error) {
-        console.error("Error loading user details:", error);
-        Alert.alert("Error", "Failed to load user details");
-      }
-    }
-
-    async function loadTrips() {
-      try {
-        const userId = auth.user;
-        const fetchedTrips = await fetchTripsByUserId(userId);
-        setTrips(fetchedTrips);
-      } catch (error) {
-        console.error("Error loading trips:", error);
-        Alert.alert("Error", "Failed to load trips");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     if (auth.user) {
       loadUserDetails();
       loadTrips();
     }
   }, [auth.user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (auth.user) {
+        loadTrips();
+      }
+    }, [auth.user])
+  );
 
   const handleImagePicked = async (imageUrl) => {
     try {
@@ -156,8 +155,8 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#161717",
+    fontFamily: "Quicksand-Bold",
+    color: Colors.textDark2,
   },
   rounded: {
     width: 80,

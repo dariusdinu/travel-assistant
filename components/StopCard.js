@@ -5,55 +5,61 @@ import iconGenerator from "../utils/IconGenerator";
 import { formatDate, formatTime } from "../utils/DateFormatter";
 import { useNavigation } from "@react-navigation/native";
 
-export default function StopCard({ stopInfo, onDelete }) {
+export default function StopCard({ stopInfo, onDelete, isActive }) {
   const navigation = useNavigation();
+
   return (
-    <View style={styles.stopContainer}>
-      <View style={styles.timelineBar}>
-        <View style={styles.dot}>
-          {iconGenerator("ellipse", 12, Colors.accent)}
-        </View>
-        <>
-          {Array(7)
-            .fill("remove")
-            .map((icon, index) => (
-              <View style={styles.rotate} key={index}>
-                {iconGenerator(icon, 20, Colors.textLight2)}
-              </View>
-            ))}
-        </>
-      </View>
-      <TouchableOpacity
-        style={styles.stopInfoContainer}
-        onPress={() => navigation.navigate("EditStop", { stopInfo })}
-      >
-        <Text style={styles.stopName}>{stopInfo.place}</Text>
-        <View style={styles.infoAddress}>
-          <View>{iconGenerator("pin", 16, Colors.textLight2)}</View>
-          <Text style={styles.stopAddress}>{stopInfo.address}</Text>
-        </View>
-        <View style={styles.infoArrival}>
-          <View style={styles.dateTimeContainerLeft}>
-            {iconGenerator("calendar-outline", 16, Colors.textLight2)}
-            <Text style={styles.stopArrivalDate}>
-              {formatDate(stopInfo.arrivalTime)}
-            </Text>
+    <>
+      <View style={styles.stopContainer}>
+        <View style={styles.timelineBar}>
+          <View style={styles.dot}>
+            {iconGenerator("ellipse", 16, Colors.accent)}
           </View>
-          <View style={styles.dateTimeContainerRight}>
-            {iconGenerator("time-outline", 16, Colors.textLight2)}
-            <Text style={styles.stopArrivalTime}>
-              {formatTime(stopInfo.arrivalTime)}
-            </Text>
-          </View>
+          <View style={styles.line}></View>
         </View>
         <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => onDelete(stopInfo._id)}
+          style={[styles.stopInfoContainer, isActive && styles.activeStop]}
+          onPress={() => navigation.navigate("EditStop", { stopInfo })}
         >
-          {iconGenerator("close-outline", 16, Colors.textLight2)}
+          {isActive && <Text style={styles.activeText}>Current Stop</Text>}
+          <Text style={styles.stopName}>{stopInfo.place}</Text>
+          <View style={styles.infoAddress}>
+            <View>{iconGenerator("pin", 16, Colors.textLight2)}</View>
+            <Text style={styles.stopAddress}>{stopInfo.address}</Text>
+          </View>
+          <View style={styles.infoArrival}>
+            <View style={styles.dateTimeContainerLeft}>
+              {iconGenerator("calendar-outline", 16, Colors.textLight2)}
+              <Text style={styles.stopArrivalDate}>
+                {formatDate(stopInfo.arrivalTime)}
+              </Text>
+            </View>
+            {stopInfo.isWheelchairAccessible && (
+              <View>
+                {iconGenerator("body-outline", 16, Colors.textLight2)}
+              </View>
+            )}
+            {stopInfo.isKidFriendly && (
+              <View>
+                {iconGenerator("happy-outline", 16, Colors.textLight2)}
+              </View>
+            )}
+            <View style={styles.dateTimeContainerRight}>
+              {iconGenerator("time-outline", 16, Colors.textLight2)}
+              <Text style={styles.stopArrivalTime}>
+                {formatTime(stopInfo.arrivalTime)}
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => onDelete(stopInfo._id)}
+          >
+            {iconGenerator("close-outline", 16, Colors.textLight2)}
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </>
   );
 }
 
@@ -66,16 +72,36 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     position: "relative",
   },
+  activeStop: {
+    borderColor: "rgba(214, 121, 63, 0.5)",
+    borderWidth: 2,
+  },
+  activeText: {
+    color: Colors.accent,
+    fontSize: 12,
+    fontFamily: "Quicksand-Regular",
+  },
   stopContainer: {
     flexDirection: "row",
     marginBottom: 10,
-    gap: 10,
   },
   timelineBar: {
     alignItems: "center",
-    transform: [{ translateY: 50 }, { scale: 1.5 }],
-    gap: -12,
+    position: "relative",
     paddingHorizontal: 10,
+    marginLeft: 2,
+  },
+  dot: {
+    zIndex: 1,
+    marginTop: 22,
+  },
+  line: {
+    position: "absolute",
+    top: 20,
+    bottom: 0,
+    width: 2,
+    backgroundColor: Colors.textLight2,
+    transform: [{ scaleY: 1.3 }, { translateY: 16 }],
   },
   stopArrivalDate: {
     fontSize: 14,
@@ -99,10 +125,6 @@ const styles = StyleSheet.create({
     fontFamily: "Quicksand-Regular",
     color: "#888",
   },
-  rotate: {
-    transform: [{ rotate: "90deg" }],
-  },
-  dot: { zIndex: 1 },
   infoAddress: {
     flex: 1,
     flexDirection: "row",

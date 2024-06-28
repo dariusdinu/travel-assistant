@@ -3,10 +3,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Colors from "../styles/colors";
 import { parseISO, isBefore, isAfter, isWithinInterval } from "date-fns";
+import ActiveTrip from "../components/ActiveTrip";
 import TripList from "../components/TripList";
 import { formatDate } from "../utils/DateFormatter";
 
-function Active({ trips, onTripPress }) {
+function Active({ trips }) {
   const now = new Date();
   const activeTrips = trips.filter((trip) =>
     isWithinInterval(now, {
@@ -27,13 +28,7 @@ function Active({ trips, onTripPress }) {
     ? `Your next trip is set for ${nextTripDate}`
     : "There aren't any active trips";
 
-  return (
-    <TripList
-      trips={activeTrips}
-      onTripPress={onTripPress}
-      emptyMessage={emptyMessage}
-    />
-  );
+  return <ActiveTrip activeTrips={activeTrips} emptyMessage={emptyMessage} />;
 }
 
 function Upcoming({ trips, onTripPress }) {

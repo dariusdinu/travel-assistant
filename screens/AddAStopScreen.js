@@ -1,9 +1,10 @@
-import React from "react";
-import { Text, View, StyleSheet, Alert } from "react-native";
+import React, { useState } from "react";
+import { Text, View, StyleSheet } from "react-native";
 import StopForm from "../components/StopForm";
 import Colors from "../styles/colors";
 import axios from "axios";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import ModalWindow from "../components/UI/ModalWindow";
 
 async function addAStopToDatabase({
   place,
@@ -48,6 +49,10 @@ export default function AddAStopScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { tripId, mode } = route.params; // Destructure mode
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
+  const [onModalConfirm, setOnModalConfirm] = useState(null);
 
   async function submitHandler(stopDetails) {
     let {
@@ -83,7 +88,10 @@ export default function AddAStopScreen() {
         navigation.navigate("ManualTrip", { stopId }); // Navigate to ManualTripScreen when creating a new trip
       }
     } catch (error) {
-      Alert.alert("Failed to add stop", error.message);
+      setModalIcon("alert-circle-outline");
+      setModalMessage(`Failed to add stop: ${error.message}`);
+      setOnModalConfirm(() => () => setModalVisible(false));
+      setModalVisible(true);
     }
   }
 
@@ -91,6 +99,13 @@ export default function AddAStopScreen() {
     <View style={styles.container}>
       <Text style={styles.header}>Add a stop</Text>
       <StopForm onSubmit={(stopDetails) => submitHandler(stopDetails)} />
+      <ModalWindow
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        iconType={modalIcon}
+        message={modalMessage}
+        onConfirm={onModalConfirm}
+      />
     </View>
   );
 }

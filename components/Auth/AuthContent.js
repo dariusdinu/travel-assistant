@@ -2,7 +2,6 @@ import { useNavigation } from "@react-navigation/native";
 import { isValid } from "date-fns";
 import { useState } from "react";
 import {
-  Alert,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -13,7 +12,7 @@ import Colors from "../../styles/colors";
 import { FlatButton } from "../UI";
 import AuthForm from "./AuthForm";
 import iconGenerator from "../../utils/IconGenerator";
-
+import ModalWindow from "../UI/ModalWindow";
 const image = {
   uri: "https://images.unsplash.com/photo-1668622456973-bc2753d8cd62?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 };
@@ -21,6 +20,9 @@ const image = {
 function AuthContent({ isLogin, onAuthenticate }) {
   const navigation = useNavigation();
   const iconNames = ["logo-facebook", "logo-instagram", "logo-twitter"];
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     firstName: false,
@@ -74,7 +76,9 @@ function AuthContent({ isLogin, onAuthenticate }) {
       !passwordIsValid ||
       (!isLogin && (!emailsAreEqual || !passwordsAreEqual))
     ) {
-      Alert.alert("Date invalide", "Verificați datele introduse.");
+      setModalIcon("checkmark-circle-outline");
+      setModalMessage("Date invalide", "Verificați datele introduse.");
+      setModalVisible(true);
       setCredentialsInvalid({
         firstName: !firstNameIsValid,
         lastName: !lastNameIsValid,

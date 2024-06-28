@@ -5,21 +5,20 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Pressable,
 } from "react-native";
-import { Button, FlatButton, IconButton } from "../components/UI";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import ImagePickerComponent from "../components/ImagePickerComponent";
 import axios from "axios";
 import Colors from "../styles/colors";
-import iconGenerator from "../utils/IconGenerator";
+import { Button, FlatButton, LoadingOverlay } from "../components/UI";
+import ImagePickerComponent from "../components/ImagePickerComponent";
 import StopList from "../components/StopList";
-import { schedulePushNotification } from "../utils/Notifications";
+import ModalWindow from "../components/UI/ModalWindow";
 import { formatDate } from "../utils/DateFormatter";
-import { LoadingOverlay } from "../components/UI";
+import iconGenerator from "../utils/IconGenerator";
+import { schedulePushNotification } from "../utils/Notifications";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -81,6 +80,10 @@ function EditTripScreen() {
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
+  const [onModalConfirm, setOnModalConfirm] = useState(null);
 
   useEffect(() => {
     async function loadTrip() {
@@ -133,35 +136,34 @@ function EditTripScreen() {
         coverPhoto: image,
       };
       await updateTripDetails(tripId, details);
-      Alert.alert("Success", "Trip details updated successfully");
-      navigation.goBack();
+      setModalIcon("checkmark-circle-outline");
+      setModalMessage("Trip details updated successfully");
+      setOnModalConfirm(() => () => navigation.goBack());
+      setModalVisible(true);
     } catch (error) {
-      Alert.alert("Error", "Failed to update trip details");
+      setModalIcon("alert-circle-outline");
+      setModalMessage("Failed to update trip details");
+      setModalVisible(true);
     }
   };
 
-  const handleDeleteTrip = async () => {
-    Alert.alert(
-      "Delete Trip",
-      "Are you sure you want to delete this trip?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteTrip(tripId);
-              Alert.alert("Success", "Trip deleted successfully");
-              navigation.goBack();
-            } catch (error) {
-              Alert.alert("Error", "Failed to delete trip");
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+  const handleDeleteTrip = () => {
+    setModalIcon("alert-circle-outline");
+    setModalMessage("Are you sure you want to delete this trip?");
+    setOnModalConfirm(() => async () => {
+      try {
+        await deleteTrip(tripId);
+        setModalIcon("checkmark-circle-outline");
+        setModalMessage("Trip deleted successfully");
+        setOnModalConfirm(() => () => navigation.navigate("UserScreen"));
+        setModalVisible(true);
+      } catch (error) {
+        setModalIcon("alert-circle-outline");
+        setModalMessage("Failed to delete trip");
+        setModalVisible(true);
+      }
+    });
+    setModalVisible(true);
   };
 
   const handleImagePicked = async (imageUrl) => {
@@ -170,7 +172,9 @@ function EditTripScreen() {
       await updateTripDetails(tripId, { coverPhoto: imageUrl });
     } catch (error) {
       console.error("Error updating trip cover photo:", error);
-      Alert.alert("Error", "Failed to update trip cover photo");
+      setModalIcon("alert-circle-outline");
+      setModalMessage("Failed to update trip cover photo");
+      setModalVisible(true);
     }
   };
 
@@ -184,6 +188,13 @@ function EditTripScreen() {
 
   return (
     <View style={styles.container}>
+      <ModalWindow
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        iconType={modalIcon}
+        message={modalMessage}
+        onConfirm={onModalConfirm}
+      />
       <TextInput
         style={styles.titleInput}
         value={title}
@@ -205,9 +216,9 @@ function EditTripScreen() {
             style={styles.datePicker}
           >
             <View>{iconGenerator("calendar", 16, Colors.accent)}</View>
-            <Text style={styles.dateText}>
-              {`  ${startDate.toDateString()}`}
-            </Text>
+            <Text
+              style={styles.dateText}
+            >{`  ${startDate.toDateString()}`}</Text>
           </TouchableOpacity>
           {showStartDatePicker && (
             <DateTimePicker

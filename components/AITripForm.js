@@ -12,6 +12,7 @@ import { Button, Input } from "../components/UI";
 import Colors from "../styles/colors";
 import Select from "../components/Select";
 import iconGenerator from "../utils/IconGenerator";
+import ModalTravelStyleInfo from "../components/ModalTravelStyleInfo";
 
 const travelStyles = [
   { label: "Explorer", value: "explorer" },
@@ -40,6 +41,7 @@ const AITripForm = ({ onSubmit }) => {
   const [mainInterests, setMainInterests] = useState([]);
   const [specialRequirements, setSpecialRequirements] = useState([]);
   const [outsidePlace, setOutsidePlace] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const toggleInterest = (interest) => {
     if (mainInterests.includes(interest)) {
@@ -101,8 +103,8 @@ const AITripForm = ({ onSubmit }) => {
           <Input
             style={styles.input}
             blurOnSubmit={false}
-            label="How many stops would be ideal?"
-            placeholder="Choose any number from 1 to 10"
+            label="How many stops per day would be ideal?"
+            placeholder="Choose the number of stops"
             keyboardType="numeric"
             value={stops}
             onUpdateValue={(value) => setStops(value)}
@@ -112,7 +114,7 @@ const AITripForm = ({ onSubmit }) => {
         <View style={styles.inputContainer}>
           <View style={styles.travelingStyleLabel}>
             <Text>Choose your traveling style</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
               {iconGenerator("information-circle", 20, Colors.textDark1)}
             </TouchableOpacity>
           </View>
@@ -206,6 +208,10 @@ const AITripForm = ({ onSubmit }) => {
           <Text style={styles.submitButtonText}>Watch the magic happen</Text>
         </Button>
       </ScrollView>
+      <ModalTravelStyleInfo
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </>
   );
 };

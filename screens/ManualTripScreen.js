@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Pressable,
 } from "react-native";
@@ -18,6 +17,7 @@ import Colors from "../styles/colors";
 import iconGenerator from "../utils/IconGenerator";
 import StopCard from "../components/StopCard";
 import { AuthContext } from "../store/AuthContext";
+import ModalWindow from "../components/UI/ModalWindow";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
@@ -78,6 +78,10 @@ function ManualTripScreen() {
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [image, setImage] = useState(null);
   const [tripId, setTripId] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalIcon, setModalIcon] = useState("");
+  const [onModalConfirm, setOnModalConfirm] = useState(null);
   const auth = useContext(AuthContext);
   const userId = auth.user;
 
@@ -133,35 +137,40 @@ function ManualTripScreen() {
         coverPhoto: image,
       };
       await updateTripDetails(tripId, details);
-      Alert.alert("Success", "Trip details updated successfully");
-      navigation.navigate("TripPlanningOptions", {
-        screen: "TripPlanningOptions",
-      });
+      setModalIcon("checkmark-circle-outline");
+      setModalMessage("Trip details saved successfully");
+      setOnModalConfirm(
+        () => () =>
+          navigation.navigate("TripPlanningOptions", {
+            screen: "TripPlanningOptions",
+          })
+      );
+      setModalVisible(true);
     } catch (error) {
-      Alert.alert("Error", "Failed to update trip details");
+      setModalIcon("alert-circle-outline");
+      setModalMessage("Failed to update trip details");
+      setOnModalConfirm(() => () => setModalVisible(false));
+      setModalVisible(true);
     }
   };
 
   const handleCancel = () => {
-    Alert.alert(
-      "Cancel Trip Creation",
-      "Are you sure you want to cancel? This will delete the current trip.",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Yes",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteTrip(tripId);
-              navigation.navigate("TripPlanningOptions");
-            } catch (error) {
-              Alert.alert("Error", "Failed to delete trip");
-            }
-          },
-        },
-      ]
+    setModalIcon("alert-circle-outline");
+    setModalMessage(
+      "Are you sure you want to cancel? This will delete the current trip."
     );
+    setOnModalConfirm(() => async () => {
+      try {
+        await deleteTrip(tripId);
+        navigation.navigate("TripPlanningOptions");
+      } catch (error) {
+        setModalIcon("alert-circle-outline");
+        setModalMessage("Failed to delete trip");
+        setOnModalConfirm(() => () => setModalVisible(false));
+        setModalVisible(true);
+      }
+    });
+    setModalVisible(true);
   };
 
   return (
@@ -233,6 +242,13 @@ function ManualTripScreen() {
           </FlatButton>
         </View>
       </ScrollView>
+      <ModalWindow
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        iconType={modalIcon}
+        message={modalMessage}
+        onConfirm={onModalConfirm}
+      />
     </View>
   );
 }
