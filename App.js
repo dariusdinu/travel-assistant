@@ -11,6 +11,14 @@ import AuthContextProvider, { AuthContext } from "./store/AuthContext";
 import { registerForPushNotificationsAsync } from "./utils/Notifications";
 import * as Notifications from "expo-notifications";
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 function Navigation() {
   const auth = useContext(AuthContext);
 
@@ -78,14 +86,10 @@ export default function App() {
     registerForPushNotificationsAsync();
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        console.log(notification);
-      });
+      Notifications.addNotificationReceivedListener((notification) => {});
 
     responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
+      Notifications.addNotificationResponseReceivedListener((response) => {});
 
     return () => {
       Notifications.removeNotificationSubscription(

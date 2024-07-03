@@ -1,12 +1,48 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
 import Colors from "../styles/colors";
 import iconGenerator from "../utils/IconGenerator";
 import { formatDate, formatTime } from "../utils/DateFormatter";
 import { useNavigation } from "@react-navigation/native";
+import ModalWindow from "../components/UI/ModalWindow";
+import ModalStopAction from "../components/ModalStopAction";
 
 export default function StopCard({ stopInfo, onDelete, isActive }) {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [actionModalVisible, setActionModalVisible] = useState(false);
+
+  const handleOpenInMaps = () => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      stopInfo.address
+    )}`;
+    Linking.openURL(url);
+  };
+
+  const handleCardPress = () => {
+    setModalVisible(true);
+  };
+
+  const handleEdit = () => {
+    setActionModalVisible(false);
+    navigation.navigate("EditStop", { stopInfo });
+  };
+
+  const handleModalConfirm = () => {
+    setModalVisible(false);
+    handleOpenInMaps();
+  };
+
+  const handleDelete = () => {
+    setActionModalVisible(false);
+    onDelete(stopInfo._id);
+  };
 
   return (
     <>
@@ -19,7 +55,7 @@ export default function StopCard({ stopInfo, onDelete, isActive }) {
         </View>
         <TouchableOpacity
           style={[styles.stopInfoContainer, isActive && styles.activeStop]}
-          onPress={() => navigation.navigate("EditStop", { stopInfo })}
+          onPress={handleCardPress}
         >
           {isActive && <Text style={styles.activeText}>Current Stop</Text>}
           <Text style={styles.stopName}>{stopInfo.place}</Text>
@@ -52,35 +88,31 @@ export default function StopCard({ stopInfo, onDelete, isActive }) {
             </View>
           </View>
           <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => onDelete(stopInfo._id)}
+            style={styles.ellipsisButton}
+            onPress={() => setActionModalVisible(true)}
           >
-            {iconGenerator("close-outline", 16, Colors.textLight2)}
+            {iconGenerator("ellipsis-vertical-outline", 16, Colors.accent)}
           </TouchableOpacity>
         </TouchableOpacity>
       </View>
+      <ModalWindow
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        iconType="alert-circle-outline"
+        message="Do you want to view this stop in Google Maps?"
+        onConfirm={handleModalConfirm}
+      />
+      <ModalStopAction
+        isVisible={actionModalVisible}
+        onClose={() => setActionModalVisible(false)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  stopInfoContainer: {
-    backgroundColor: Colors.background,
-    borderRadius: 20,
-    flexGrow: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    position: "relative",
-  },
-  activeStop: {
-    borderColor: "rgba(214, 121, 63, 0.5)",
-    borderWidth: 2,
-  },
-  activeText: {
-    color: Colors.accent,
-    fontSize: 12,
-    fontFamily: "Quicksand-Regular",
-  },
   stopContainer: {
     flexDirection: "row",
     marginBottom: 10,
@@ -101,19 +133,25 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 2,
     backgroundColor: Colors.textLight2,
-    transform: [{ scaleY: 1.3 }, { translateY: 16 }],
+    transform: [{ scaleY: 1.25 }, { translateY: 16 }],
   },
-  stopArrivalDate: {
-    fontSize: 14,
-    paddingTop: 10,
-    color: "#555",
-    fontFamily: "Quicksand-Regular",
+  stopInfoContainer: {
+    backgroundColor: Colors.background,
+    borderRadius: 20,
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    position: "relative",
   },
-  stopArrivalTime: {
-    fontSize: 14,
-    color: "#555",
+  activeStop: {
+    borderColor: Colors.accent,
+    borderWidth: 2,
+  },
+  activeText: {
+    color: Colors.accent,
+    fontSize: 12,
     fontFamily: "Quicksand-Regular",
-    textAlign: "right",
+    marginBottom: 5,
   },
   stopName: {
     fontSize: 24,
@@ -129,17 +167,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-end",
+    marginBottom: 5,
   },
   infoArrival: {
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 5,
-  },
-  deleteButton: {
-    position: "absolute",
-    right: 18,
-    top: 20,
+    marginBottom: 5,
   },
   dateTimeContainerLeft: {
     flex: 1,
@@ -152,5 +187,22 @@ const styles = StyleSheet.create({
     gap: 3,
     alignItems: "flex-end",
     flexDirection: "row-reverse",
+  },
+  stopArrivalDate: {
+    fontSize: 14,
+    paddingTop: 10,
+    color: "#555",
+    fontFamily: "Quicksand-Regular",
+  },
+  stopArrivalTime: {
+    fontSize: 14,
+    color: "#555",
+    fontFamily: "Quicksand-Regular",
+    textAlign: "right",
+  },
+  ellipsisButton: {
+    position: "absolute",
+    right: 18,
+    top: 20,
   },
 });

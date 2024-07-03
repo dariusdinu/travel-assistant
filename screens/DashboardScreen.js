@@ -6,13 +6,18 @@ import axios from "axios";
 import { formatDate } from "../utils/DateFormatter";
 import Colors from "../styles/colors";
 import * as Progress from "react-native-progress";
-import { differenceInDays, endOfYear } from "date-fns";
+import {
+  differenceInDays,
+  endOfYear,
+  compareAsc,
+  differenceInCalendarDays,
+} from "date-fns";
 import { Card } from "react-native-paper";
 import { LoadingOverlay } from "../components/UI";
 
 const screenWidth = Dimensions.get("window").width;
 
-const apiUrl = process.env.EXPO_PUBLIC_API_URL; // Ensure this is set in your .env file
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 function DashboardScreen() {
   const [trips, setTrips] = useState([]);
@@ -60,10 +65,11 @@ function DashboardScreen() {
   const averageDaysTraveled =
     totalTrips > 0 ? (totalDaysTraveled / totalTrips).toFixed(2) : 0;
 
-  const mostRecentTrip = trips.reduce((latest, trip) => {
-    const tripEndDate = new Date(trip.dateRange.end);
-    return tripEndDate > new Date(latest.dateRange.end) ? trip : latest;
-  }, trips[0]);
+  const mostRecentTrip = trips
+    .filter((trip) => new Date(trip.dateRange.start) <= new Date())
+    .sort((a, b) =>
+      compareAsc(new Date(b.dateRange.end), new Date(a.dateRange.end))
+    )[0];
 
   const currentTrip = trips.find((trip) => {
     const startDate = new Date(trip.dateRange.start);
@@ -73,15 +79,22 @@ function DashboardScreen() {
   });
 
   const daysLeftInCurrentTrip = currentTrip
-    ? differenceInDays(new Date(currentTrip.dateRange.end), new Date())
+    ? differenceInCalendarDays(new Date(currentTrip.dateRange.end), new Date())
     : 0;
 
   const totalDaysInCurrentTrip = currentTrip
-    ? differenceInDays(
+    ? differenceInCalendarDays(
         new Date(currentTrip.dateRange.end),
         new Date(currentTrip.dateRange.start)
       ) + 1
     : 1;
+
+  const daysPassedInCurrentTrip = currentTrip
+    ? differenceInCalendarDays(
+        new Date(),
+        new Date(currentTrip.dateRange.start)
+      )
+    : 0;
 
   const tripsLeftInYear = trips.filter(
     (trip) => new Date(trip.dateRange.start) > new Date()
@@ -189,14 +202,10 @@ function DashboardScreen() {
           </Text>
           <Progress.Circle
             size={150}
-            progress={
-              daysLeftInCurrentTrip / (currentTrip ? totalDaysInCurrentTrip : 1)
-            }
+            progress={daysPassedInCurrentTrip / totalDaysInCurrentTrip}
             showsText={true}
             formatText={() =>
-              ` ${daysLeftInCurrentTrip}/${
-                currentTrip ? totalDaysInCurrentTrip : 1
-              } `
+              ` ${daysPassedInCurrentTrip}/${totalDaysInCurrentTrip} `
             }
             color={Colors.accent}
             thickness={10}
@@ -209,9 +218,16 @@ function DashboardScreen() {
           </Text>
           <Progress.Circle
             size={150}
-            progress={tripsLeftInYear / totalTrips}
+            progress={
+              tripsLeftInYear /
+              (tripsLeftInYear + (totalTrips - tripsLeftInYear))
+            }
             showsText={true}
-            formatText={() => ` ${tripsLeftInYear}/${totalTrips} `}
+            formatText={() =>
+              ` ${tripsLeftInYear}/${
+                tripsLeftInYear + (totalTrips - tripsLeftInYear)
+              } `
+            }
             color={Colors.accent}
             thickness={10}
           />

@@ -16,7 +16,9 @@ export async function registerForPushNotificationsAsync() {
       alert("Failed to get push token for push notification!");
       return;
     }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
+    token = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig.extra.eas.projectId,
+    });
     console.log(token);
   } else {
     alert("Must use physical device for Push Notifications");
@@ -26,11 +28,23 @@ export async function registerForPushNotificationsAsync() {
 }
 
 export async function schedulePushNotification(title, body, trigger) {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: title,
-      body: body,
-    },
-    trigger: trigger,
-  });
+  const existingNotifications =
+    await Notifications.getAllScheduledNotificationsAsync();
+  const isScheduled = existingNotifications.some(
+    (notification) =>
+      notification.content.title === title &&
+      notification.content.body === body &&
+      notification.trigger.date === trigger.date
+  );
+
+  if (!isScheduled) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: title,
+        body: body,
+        sound: "default",
+      },
+      trigger: trigger,
+    });
+  }
 }

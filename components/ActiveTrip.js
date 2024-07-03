@@ -1,7 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
 import Colors from "../styles/colors";
 import StopCard from "./StopCard";
+import { LinearGradient } from "expo-linear-gradient";
+import { formatDate } from "../utils/DateFormatter";
 import iconGenerator from "../utils/IconGenerator";
 
 export default function ActiveTrip({ activeTrips, emptyMessage }) {
@@ -24,6 +32,25 @@ export default function ActiveTrip({ activeTrips, emptyMessage }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.imageContainer}>
+        <ImageBackground
+          source={{ uri: activeTrip.coverPhoto }}
+          resizeMode="cover"
+          style={styles.imageBackground}
+        >
+          <LinearGradient
+            colors={["#232F2F22", "#232F2Fbb"]}
+            style={styles.linearGradient}
+          >
+            <View style={styles.tripInfo}>
+              <Text style={styles.tripTitle}>{activeTrip.title}</Text>
+              <Text style={styles.tripDateRange}>{`${formatDate(
+                activeTrip.dateRange.start
+              )} - ${formatDate(activeTrip.dateRange.end)}`}</Text>
+            </View>
+          </LinearGradient>
+        </ImageBackground>
+      </View>
       {activeTrip.stops.map((stop, index) => (
         <StopCard
           key={stop._id}
@@ -43,9 +70,39 @@ export default function ActiveTrip({ activeTrips, emptyMessage }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 100,
-    paddingTop: 20,
+    paddingBottom: 300,
     backgroundColor: Colors.primary,
+  },
+  imageContainer: {
+    height: 200,
+    borderRadius: 20,
+    overflow: "hidden",
+    marginVertical: 20,
+  },
+  imageBackground: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  linearGradient: {
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+    height: "100%",
+    justifyContent: "flex-end",
+  },
+  tripInfo: {
+    alignItems: "flex-start",
+    paddingLeft: 10,
+    paddingBottom: 10,
+  },
+  tripTitle: {
+    fontSize: 26,
+    fontFamily: "Quicksand-SemiBold",
+    color: Colors.textLight,
+  },
+  tripDateRange: {
+    fontSize: 14,
+    color: Colors.textLight,
+    fontFamily: "Quicksand-SemiBold",
   },
   noTripsInfoContainer: {
     flex: 1,

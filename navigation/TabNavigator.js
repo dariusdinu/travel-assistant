@@ -1,21 +1,20 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import UserScreen from "../screens/UserScreen";
 import { DashboardScreen, ExploreScreen } from "../screens";
-import HelpScreen from "../screens/HelpScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import TripPlanner from "../screens/TripPlannerScreen";
 import iconGenerator from "../utils/IconGenerator";
 import Colors from "../styles/colors";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { View } from "react-native";
-import TabBarTrips from "./TabBarTrips";
 
 const Tab = createBottomTabNavigator();
 
 const TabArr = [
   {
     route: "UserScreen",
-    label: " Profile ",
-    iconName: "person",
+    label: " Trips ",
+    iconName: "compass",
     component: UserScreen,
   },
   {
@@ -37,10 +36,10 @@ const TabArr = [
     component: ExploreScreen,
   },
   {
-    route: "HelpScreen",
-    label: "Help",
-    iconName: "help",
-    component: HelpScreen,
+    route: "ProfileScreen",
+    label: "Profile",
+    iconName: "person",
+    component: ProfileScreen,
   },
 ];
 
@@ -79,6 +78,7 @@ export default function TabNavigator() {
           paddingTop: 9,
           paddingHorizontal: 6,
           position: "absolute",
+          backgroundColor: Colors.background,
         },
         tabBarItemStyle: {
           marginVertical: 10,

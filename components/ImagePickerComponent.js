@@ -134,12 +134,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   imagePlaceholderProfile: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 50,
+    borderRadius: 100,
   },
   image: {
     width: "100%",

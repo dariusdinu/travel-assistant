@@ -108,31 +108,6 @@ function UserScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.profileSection}>
-        <View style={styles.rounded}>
-          <ImagePickerComponent
-            type="profile"
-            defaultImage={
-              userDetails && userDetails.profilePicture
-                ? { uri: userDetails.profilePicture }
-                : require("../assets/empty-profile-picture.png")
-            }
-            onImagePicked={handleImagePicked}
-          />
-        </View>
-        {userDetails && (
-          <Text style={styles.profileName}>
-            {userDetails.firstName} {userDetails.lastName}
-          </Text>
-        )}
-        <IconButton
-          onPress={auth.signOut}
-          icon={"exit-outline"}
-          color={Colors.accent}
-          size={27}
-        />
-      </View>
-
       <TabBarTrips trips={trips} onTripPress={handleTripPress} />
     </View>
   );

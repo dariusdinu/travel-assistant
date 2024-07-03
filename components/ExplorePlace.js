@@ -6,39 +6,16 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import Colors from "../styles/colors";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
+import { renderStars } from "../utils/RenderStars";
 
 const ExplorePlace = ({ place }) => {
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const halfStar = rating - fullStars >= 0.5;
+  const navigation = useNavigation();
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Ionicons
-          key={`full-${i}`}
-          name="star-sharp"
-          size={14}
-          color={Colors.textLight}
-        />
-      );
-    }
-
-    if (halfStar) {
-      stars.push(
-        <Ionicons
-          key="half"
-          name="star-half-sharp"
-          size={14}
-          color={Colors.textLight}
-        />
-      );
-    }
-
-    return stars;
+  const handlePress = () => {
+    navigation.navigate("ExplorePlaceScreen", { place });
   };
 
   const photoReference =
@@ -50,7 +27,7 @@ const ExplorePlace = ({ place }) => {
     : null;
 
   return (
-    <TouchableOpacity style={styles.placeCard}>
+    <TouchableOpacity style={styles.placeCard} onPress={handlePress}>
       {imageUrl ? (
         <ImageBackground
           source={{ uri: imageUrl }}
