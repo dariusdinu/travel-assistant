@@ -77,23 +77,6 @@ function UserScreen() {
     }, [auth.user])
   );
 
-  const handleImagePicked = async (imageUrl) => {
-    try {
-      const userId = auth.user;
-      const existingUserDetails = await fetchUserDetails(userId);
-      const updatedDetails = {
-        ...existingUserDetails,
-        profilePicture: imageUrl,
-      };
-
-      await axios.put(`${apiUrl}/users/${userId}`, updatedDetails);
-      setUserDetails(updatedDetails);
-    } catch (error) {
-      console.error("Error updating profile picture:", error);
-      Alert.alert("Error", "Failed to update profile picture");
-    }
-  };
-
   const handleTripPress = (tripId) => {
     navigation.navigate("EditTrip", { tripId });
   };

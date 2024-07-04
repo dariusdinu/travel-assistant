@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  Animated,
+  Easing,
+} from "react-native";
 import { BarChart, PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import axios from "axios";
@@ -23,6 +30,9 @@ function DashboardScreen() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const translateXAnim = useRef(new Animated.Value(100)).current;
+
   useEffect(() => {
     async function fetchTrips() {
       try {
@@ -32,11 +42,29 @@ function DashboardScreen() {
         console.error("Error fetching trips:", error);
       } finally {
         setLoading(false);
+        animateCards();
       }
     }
 
     fetchTrips();
   }, []);
+
+  const animateCards = () => {
+    Animated.parallel([
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.sin,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateXAnim, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.sin,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   if (loading) {
     return <LoadingOverlay message="Loading your dashboard..." />;
@@ -142,7 +170,12 @@ function DashboardScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Dashboard</Text>
-      <View style={styles.dashboard}>
+      <Animated.View
+        style={[
+          styles.dashboard,
+          { opacity: opacityAnim, transform: [{ translateY: translateXAnim }] },
+        ]}
+      >
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statText}>Total Trips</Text>
@@ -232,7 +265,7 @@ function DashboardScreen() {
             thickness={10}
           />
         </View>
-      </View>
+      </Animated.View>
     </ScrollView>
   );
 }

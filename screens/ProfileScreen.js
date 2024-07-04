@@ -172,9 +172,7 @@ function ProfileScreen() {
         onConfirm={onModalConfirm}
         backdropColor={Colors.accent}
       />
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile </Text>
-      </View>
+      <View style={styles.header}></View>
       <View style={styles.profileContainer}>
         <ImagePickerComponent
           type="profile"

@@ -17,6 +17,7 @@ import ModalWindow from "../components/UI/ModalWindow";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import iconGenerator from "../utils/IconGenerator";
+import { isWithinInterval, parseISO } from "date-fns";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 const googleApiKey = "AIzaSyDj8oH1DULLrIzJ8a35YL72tnTRDfTnEjE";
@@ -63,9 +64,19 @@ const ExplorePlaceScreen = () => {
   };
 
   const handleAddStop = () => {
-    const activeTrip = trips.find((trip) => trip.status === "active");
-    if (activeTrip) {
-      navigation.navigate("AddAStopScreen", { place });
+    const now = new Date();
+    const activeTrips = trips.filter((trip) =>
+      isWithinInterval(now, {
+        start: parseISO(trip.dateRange.start),
+        end: parseISO(trip.dateRange.end),
+      })
+    );
+    if (activeTrips.length > 0) {
+      navigation.navigate("AddAStopScreen", {
+        mode: "Google Place",
+        googlePlace: { ...place, website: placeDetails.website },
+        tripId: activeTrips[0]._id,
+      });
     } else {
       setModalMessage("You currently do not have an active trip.");
       setModalVisible(true);

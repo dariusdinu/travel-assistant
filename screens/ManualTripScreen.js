@@ -200,6 +200,7 @@ function ManualTripScreen() {
               mode="date"
               display="default"
               onChange={(e, date) => handleDateChange(e, date, "start")}
+              minimumDate={new Date()}
             />
           )}
           <Text style={styles.dateLabel}>End Date</Text>
@@ -216,6 +217,7 @@ function ManualTripScreen() {
               mode="date"
               display="default"
               onChange={(e, date) => handleDateChange(e, date, "end")}
+              minimumDate={startDate}
             />
           )}
         </View>

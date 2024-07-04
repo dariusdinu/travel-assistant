@@ -1,15 +1,48 @@
-import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useRef, useEffect, useContext } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Easing,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../styles/colors";
 import { AuthContext } from "../store/AuthContext";
 
 function TripPlanningOptions({ navigation }) {
   const auth = useContext(AuthContext);
+
+  const topCardAnim = useRef(new Animated.Value(-1000)).current;
+  const bottomCardAnim = useRef(new Animated.Value(1000)).current;
+
+  useEffect(() => {
+    Animated.timing(topCardAnim, {
+      toValue: 0,
+      duration: 1000,
+      easing: Easing.bezier(0, 1, 1, 1),
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(bottomCardAnim, {
+      toValue: 0,
+      duration: 1000,
+      easing: Easing.bezier(0, 1, 1, 1),
+      useNativeDriver: true,
+    }).start();
+  }, [topCardAnim, bottomCardAnim]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Start a new adventure</Text>
-      <View style={[styles.card, styles.topCard]}>
+      <Animated.View
+        style={[
+          styles.card,
+          styles.topCard,
+          { transform: [{ translateX: topCardAnim }] },
+        ]}
+      >
         <TouchableOpacity
           style={styles.cardContent}
           onPress={() => navigation.navigate("AITrip")}
@@ -31,8 +64,14 @@ function TripPlanningOptions({ navigation }) {
             <Ionicons name="flash-outline" size={36} color={Colors.textLight} />
           </View>
         </TouchableOpacity>
-      </View>
-      <View style={[styles.card, styles.bottomCard]}>
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.card,
+          styles.bottomCard,
+          { transform: [{ translateX: bottomCardAnim }] },
+        ]}
+      >
         <TouchableOpacity
           style={styles.cardContent}
           onPress={() =>
@@ -61,7 +100,7 @@ function TripPlanningOptions({ navigation }) {
             />
           </View>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }

@@ -11,7 +11,6 @@ import ModalWindow from "../components/UI/ModalWindow";
 async function createStop(stopData, tripId) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const url = `${apiUrl}/stops`;
-  console.log("Stop data in createStop: ", stopData);
 
   const stop = {
     ...stopData,
@@ -59,7 +58,6 @@ async function createTripFromAPIResponse(userId, generatedTrip) {
           stopData.meetsRequirements.isWheelchairAccessible,
         isKidFriendly: stopData.meetsRequirements.isKidFriendly,
       };
-      console.log("Stop details in createTripFromAPIResponse: ", stopDetails);
 
       return createStop(stopDetails, tripId);
     });
@@ -89,7 +87,7 @@ export default function AiTripScreen() {
 
   const handleFormSubmit = async (formData) => {
     // prettier-ignore
-    const prompt = `Generate a trip plan for a traveler with the following details: Place: ${formData.place} Arrival Date: ${formData.arrivalDate.toDateString()} Leave Date: ${formData.leaveDate.toDateString()} Number of Daily Stops : ${formData.stops} Traveling Style: ${formData.travelingStyle} Main Interests: ${formData.mainInterests.join(", ")} Special Requirements: ${formData.specialRequirements.join(", ")} Outside Place: ${formData.outsidePlace ? "Yes" : "No"} Please ensure that the recommendations: Align with the specified traveling style (e.g., adventure, leisure, cultural), Cater to the main interests of the traveler, Fulfill any special requirements mentioned (indicate if the requirement is met or not for each stop), Include outside locations close to the specified place if the traveler prefers, Add as many daily stops as they intend. Please format the response as a JSON object with the following structure: {"trip":{"title":"Trip to ${formData.place}","startDate":"${formData.arrivalDate.toISOString()}","endDate":"${formData.leaveDate.toISOString()}","stops":[{"place":"[Stop Place]","address":"[Stop Address]","arrivalTime":"[Stop Arrival Time]","website":"[Stop Website]","meetsRequirements": {"isWheelchairAccessible": "[True/False]","isKidFriendly": "[True/False]"}}]}}"`;
+    const prompt = `Generate a trip plan for a traveler with the following details: Place: ${formData.place} Arrival Date: ${formData.arrivalDate.toDateString()} Leave Date: ${formData.leaveDate.toDateString()} Average Number of Stops for Each Day: ${formData.stops} Traveling Style: ${formData.travelingStyle} Main Interests: ${formData.mainInterests.join(", ")} Special Requirements: ${formData.specialRequirements.join(", ")} Outside Place: ${formData.outsidePlace ? "Yes" : "No"} Please ensure that the recommendations: Align with the specified traveling style (e.g., adventure, leisure, cultural), Cater to the main interests of the traveler, Fulfill any special requirements mentioned (indicate if the requirement is met or not for each stop), Include outside locations close to the specified place if the traveler prefers, Add as many daily stops as they intend. Please format the response as a JSON object with the following structure: {"trip":{"title":"Trip to ${formData.place}","startDate":"${formData.arrivalDate.toISOString()}","endDate":"${formData.leaveDate.toISOString()}","stops":[{"place":"[Stop Place]","address":"[Stop Address]","arrivalTime":"[Stop Arrival Time]","website":"[Stop Website]","meetsRequirements": {"isWheelchairAccessible": "[True/False]","isKidFriendly": "[True/False]"}}]}}"`;
     setCurrentTripPlace(formData.place);
     setIsLoading(true);
     try {
@@ -100,11 +98,10 @@ export default function AiTripScreen() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt, maxTokens: 1000, temperature: 0.7 }),
+        body: JSON.stringify({ prompt, maxTokens: 2000, temperature: 0.7 }),
       });
       const data = await response.json();
       const generatedTrip = JSON.parse(data.choices[0].text.trim());
-      console.log("generatedTrip.trip.stops: ", generatedTrip.trip.stops);
 
       saveGeneratedTrip(generatedTrip.trip);
     } catch (error) {
