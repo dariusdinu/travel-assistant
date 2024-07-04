@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Input } from "./UI";
-import { StyleSheet, Text, View, TextInput, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import DateInput from "./DateInput";
 import ImagePickerComponent from "./ImagePickerComponent";
 import Colors from "../styles/colors";
@@ -12,15 +12,20 @@ function StopForm({ onSubmit, initialData, buttonText }) {
   const inputWebsiteRef = useRef(null);
   const inputNotesRef = useRef(null);
 
+  const parseDate = (date) => {
+    const parsedDate = new Date(date);
+    return !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
+  };
+
   const [enteredPlace, setEnteredPlace] = useState(initialData?.place || "");
   const [enteredAddress, setEnteredAddress] = useState(
     initialData?.address || ""
   );
   const [enteredArrivalDate, setEnteredArrivalDate] = useState(
-    initialData?.arrivalDate ? new Date(initialData.arrivalDate) : new Date()
+    initialData?.arrivalTime ? parseDate(initialData.arrivalTime) : new Date()
   );
   const [enteredArrivalTime, setEnteredArrivalTime] = useState(
-    initialData?.arrivalTime ? new Date(initialData.arrivalTime) : new Date()
+    initialData?.arrivalTime ? parseDate(initialData.arrivalTime) : new Date()
   );
   const [enteredWebsite, setEnteredWebsite] = useState(
     initialData?.website || ""
@@ -35,8 +40,9 @@ function StopForm({ onSubmit, initialData, buttonText }) {
     if (initialData) {
       setEnteredPlace(initialData.place);
       setEnteredAddress(initialData.address);
-      setEnteredArrivalDate(new Date(initialData.arrivalTime));
-      setEnteredArrivalTime(new Date(initialData.arrivalTime));
+      const parsedArrivalTime = parseDate(initialData.arrivalTime);
+      setEnteredArrivalDate(parsedArrivalTime);
+      setEnteredArrivalTime(parsedArrivalTime);
       setEnteredWebsite(initialData.website);
       setEnteredNotes(initialData.notes);
       setEnteredImages(initialData.images || []);
@@ -146,6 +152,7 @@ function StopForm({ onSubmit, initialData, buttonText }) {
             key={index}
             isProfile={false}
             onImagePicked={(imageUri) => handleImagePicked(index, imageUri)}
+            type={"stopForm"}
           />
         ))}
       </View>
@@ -187,8 +194,9 @@ const styles = StyleSheet.create({
   },
   imagesContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 16,
+    justifyContent: "space-around",
+    marginVertical: 16,
+    gap: 5,
   },
   filesContainer: {
     marginBottom: 16,

@@ -3,6 +3,7 @@ import MainScreen from "../screens/MainScreen";
 import EditTripScreen from "../screens/EditTripScreen";
 import { AddAStopScreen } from "../screens";
 import EditStopScreen from "../screens/EditStopScreen";
+import ExploreCategoryScreen from "../screens/ExploreCategoryScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,11 @@ export default function StackMain() {
       <Stack.Screen
         name="AddAStopScreen"
         component={AddAStopScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ExploreScreen"
+        component={ExploreCategoryScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

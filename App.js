@@ -30,7 +30,7 @@ function Navigation() {
   );
 }
 
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 function Root() {
   const [appIsReady, setAppIsReady] = useState(false);
@@ -61,18 +61,18 @@ function Root() {
     prepare();
   }, []);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady && (fontsLoaded || fontError)) {
-      await SplashScreen.hideAsync();
-    }
-  }, [appIsReady, fontsLoaded, fontError]);
+  // const onLayoutRootView = useCallback(async () => {
+  //   if (appIsReady && (fontsLoaded || fontError)) {
+  //     await SplashScreen.hideAsync();
+  //   }
+  // }, [appIsReady, fontsLoaded, fontError]);
 
   if (!appIsReady || (!fontsLoaded && !fontError)) {
     return null;
   }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <View style={styles.container}>
       <Navigation />
     </View>
   );

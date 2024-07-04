@@ -48,11 +48,21 @@ async function addAStopToDatabase({
 export default function AddAStopScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { tripId, mode } = route.params; // Destructure mode
+  const { tripId, mode, googlePlace } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalIcon, setModalIcon] = useState("");
   const [onModalConfirm, setOnModalConfirm] = useState(null);
+
+  const initialData =
+    mode === "Google Place"
+      ? {
+          place: googlePlace.name,
+          address: googlePlace.vicinity,
+          website: googlePlace.website || "",
+          arrivalTime: new Date(),
+        }
+      : {};
 
   async function submitHandler(stopDetails) {
     let {
@@ -83,9 +93,11 @@ export default function AddAStopScreen() {
       const stopId = stopData._id;
 
       if (mode === "edit") {
-        navigation.navigate("EditTrip", { tripId }); // Navigate back to EditTripScreen
+        navigation.navigate("EditTrip", { tripId });
+      } else if (mode === "Google Place") {
+        navigation.navigate("ExploreCategoryScreen");
       } else {
-        navigation.navigate("ManualTrip", { stopId }); // Navigate to ManualTripScreen when creating a new trip
+        navigation.navigate("ManualTrip", { stopId });
       }
     } catch (error) {
       setModalIcon("alert-circle-outline");
@@ -98,7 +110,10 @@ export default function AddAStopScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Add a stop</Text>
-      <StopForm onSubmit={(stopDetails) => submitHandler(stopDetails)} />
+      <StopForm
+        onSubmit={(stopDetails) => submitHandler(stopDetails)}
+        initialData={initialData}
+      />
       <ModalWindow
         isVisible={modalVisible}
         onClose={() => setModalVisible(false)}

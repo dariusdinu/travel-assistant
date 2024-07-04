@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
   ImageBackground,
   StyleSheet,
   TouchableOpacity,
+  Animated,
+  Easing,
 } from "react-native";
 import Colors from "../styles/colors";
 import { LinearGradient } from "expo-linear-gradient";
@@ -13,6 +15,16 @@ import { renderStars } from "../utils/RenderStars";
 
 const ExplorePlace = ({ place }) => {
   const navigation = useNavigation();
+  const translateYAnim = useRef(new Animated.Value(50)).current;
+
+  useEffect(() => {
+    Animated.timing(translateYAnim, {
+      toValue: 0,
+      duration: 800,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handlePress = () => {
     navigation.navigate("ExplorePlaceScreen", { place });
@@ -27,18 +39,33 @@ const ExplorePlace = ({ place }) => {
     : null;
 
   return (
-    <TouchableOpacity style={styles.placeCard} onPress={handlePress}>
-      {imageUrl ? (
-        <ImageBackground
-          source={{ uri: imageUrl }}
-          resizeMode="cover"
-          style={styles.imageBackground}
-        >
-          <LinearGradient
-            colors={["#232F2F22", "#232F2Fbb"]}
-            style={styles.linearGradient}
+    <Animated.View style={{ transform: [{ translateY: translateYAnim }] }}>
+      <TouchableOpacity style={styles.placeCard} onPress={handlePress}>
+        {imageUrl ? (
+          <ImageBackground
+            source={{ uri: imageUrl }}
+            resizeMode="cover"
+            style={styles.imageBackground}
           >
-            <View style={styles.placeInfo}>
+            <LinearGradient
+              colors={["#232F2F22", "#232F2Fbb"]}
+              style={styles.linearGradient}
+            >
+              <View style={styles.placeInfo}>
+                <Text style={styles.placeName}>{place.name}</Text>
+                <Text style={styles.placeVicinity}>{place.vicinity}</Text>
+                {place.rating && (
+                  <View style={styles.ratingContainer}>
+                    {renderStars(place.rating)}
+                    <Text style={styles.ratingText}>{place.rating}/5</Text>
+                  </View>
+                )}
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+        ) : (
+          <View style={[styles.imageBackground, styles.noImageBackground]}>
+            <View style={[styles.placeInfo, styles.linearGradient]}>
               <Text style={styles.placeName}>{place.name}</Text>
               <Text style={styles.placeVicinity}>{place.vicinity}</Text>
               {place.rating && (
@@ -48,23 +75,10 @@ const ExplorePlace = ({ place }) => {
                 </View>
               )}
             </View>
-          </LinearGradient>
-        </ImageBackground>
-      ) : (
-        <View style={[styles.imageBackground, styles.noImageBackground]}>
-          <View style={[styles.placeInfo, styles.linearGradient]}>
-            <Text style={styles.placeName}>{place.name}</Text>
-            <Text style={styles.placeVicinity}>{place.vicinity}</Text>
-            {place.rating && (
-              <View style={styles.ratingContainer}>
-                {renderStars(place.rating)}
-                <Text style={styles.ratingText}>{place.rating}/5</Text>
-              </View>
-            )}
           </View>
-        </View>
-      )}
-    </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 

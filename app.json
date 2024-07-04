@@ -10,17 +10,25 @@
       "image": "./assets/splash-screen.png",
       "resizeMode": "cover"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/splash-screen.png"
-      }
+      },
+      "package": "com.dariusdinu.travelassistant"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "593836d5-190b-4a9a-915c-b0dd5ca467c5"
+      }
     }
   }
 }

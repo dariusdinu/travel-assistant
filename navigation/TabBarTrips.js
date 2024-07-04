@@ -7,7 +7,7 @@ import ActiveTrip from "../components/ActiveTrip";
 import TripList from "../components/TripList";
 import { formatDate } from "../utils/DateFormatter";
 
-function Active({ trips }) {
+function Active({ trips, onTripPress }) {
   const now = new Date();
   const activeTrips = trips.filter((trip) =>
     isWithinInterval(now, {
@@ -28,7 +28,13 @@ function Active({ trips }) {
     ? `Your next trip is set for ${nextTripDate}`
     : "There aren't any active trips";
 
-  return <ActiveTrip activeTrips={activeTrips} emptyMessage={emptyMessage} />;
+  return (
+    <ActiveTrip
+      activeTrips={activeTrips}
+      emptyMessage={emptyMessage}
+      onTripPress={onTripPress}
+    />
+  );
 }
 
 function Upcoming({ trips, onTripPress }) {

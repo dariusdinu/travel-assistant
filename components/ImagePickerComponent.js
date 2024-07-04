@@ -94,6 +94,8 @@ export default function ImagePickerComponent({
         style={
           type === "profile"
             ? styles.imagePlaceholderProfile
+            : type === "stopForm"
+            ? styles.imagePlaceholderStopForm
             : styles.imagePlaceholder
         }
         onPress={pickImage}
@@ -141,10 +143,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 100,
   },
+  imagePlaceholderStopForm: {
+    width: 80,
+    height: 80,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+  },
   image: {
     width: "100%",
     height: "100%",
     borderRadius: 20,
+  },
+  addAStop: {
+    width: "100%",
+    height: "100%",
   },
   profile: {
     width: "100%",

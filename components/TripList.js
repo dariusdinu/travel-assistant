@@ -4,15 +4,21 @@ import TripComponent from "../components/TripComponent";
 import Colors from "../styles/colors";
 
 export default function TripList({ trips, onTripPress, emptyMessage }) {
+  const sortedTrips = trips.sort((a, b) => {
+    const startDateA = new Date(a.dateRange.start);
+    const startDateB = new Date(b.dateRange.start);
+    return startDateA - startDateB;
+  });
+
   return (
     <View style={styles.tabContainer}>
-      {trips.length === 0 ? (
+      {sortedTrips.length === 0 ? (
         <View style={styles.noTripsInfoContainer}>
           <Text style={styles.message}>{emptyMessage}</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          {trips.map((trip) => (
+          {sortedTrips.map((trip) => (
             <TripComponent key={trip._id} trip={trip} onPress={onTripPress} />
           ))}
         </ScrollView>
@@ -39,6 +45,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingVertical: 20,
+    paddingHorizontal: 5,
     paddingBottom: 100,
   },
 });

@@ -98,6 +98,7 @@ const AITripForm = ({ onSubmit }) => {
           value={leaveDate}
           onChange={setLeaveDate}
           mode="date"
+          minimumDate={arrivalDate}
         />
         <View style={styles.inputContainer}>
           <Input

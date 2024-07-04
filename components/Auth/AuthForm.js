@@ -13,12 +13,12 @@ function AuthForm({ credentialsInvalid, isLogin, onSubmit }) {
   const inputPasswordRef = useRef(null);
   const inputConfirmPasswordRef = useRef(null);
 
-  const [enteredFirstName, setEnteredFirstName] = useState("Marius");
-  const [enteredLastName, setEnteredLastName] = useState("Darius");
+  const [enteredFirstName, setEnteredFirstName] = useState("Darius");
+  const [enteredLastName, setEnteredLastName] = useState("Dinu");
   const [enteredBirthDate, setEnteredBirthDate] = useState(new Date());
-  const [enteredEmail, setEnteredEmail] = useState("marius.darius@email.com");
+  const [enteredEmail, setEnteredEmail] = useState("darius.dinu@email.com");
   const [enteredConfirmEmail, setEnteredConfirmEmail] = useState(
-    "marius.darius@email.com"
+    "darius.dinu@email.com"
   );
   const [enteredPassword, setEnteredPassword] = useState("Qwertyuiop.1");
   const [enteredConfirmPassword, setEnteredConfirmPassword] =

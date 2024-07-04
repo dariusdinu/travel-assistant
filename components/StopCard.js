@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Linking,
+  Animated,
 } from "react-native";
 import Colors from "../styles/colors";
 import iconGenerator from "../utils/IconGenerator";
@@ -17,6 +18,15 @@ export default function StopCard({ stopInfo, onDelete, isActive }) {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(opacityAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handleOpenInMaps = () => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -31,7 +41,7 @@ export default function StopCard({ stopInfo, onDelete, isActive }) {
 
   const handleEdit = () => {
     setActionModalVisible(false);
-    navigation.navigate("EditStop", { stopInfo });
+    navigation.navigate("EditStopScreen", { stopInfo });
   };
 
   const handleModalConfirm = () => {
@@ -53,47 +63,63 @@ export default function StopCard({ stopInfo, onDelete, isActive }) {
           </View>
           <View style={styles.line}></View>
         </View>
-        <TouchableOpacity
-          style={[styles.stopInfoContainer, isActive && styles.activeStop]}
-          onPress={handleCardPress}
+        <Animated.View
+          style={[
+            styles.stopInfoContainer,
+            isActive && styles.activeStop,
+            { opacity: opacityAnim },
+          ]}
         >
-          {isActive && <Text style={styles.activeText}>Current Stop</Text>}
-          <Text style={styles.stopName}>{stopInfo.place}</Text>
-          <View style={styles.infoAddress}>
-            <View>{iconGenerator("pin", 16, Colors.textLight2)}</View>
-            <Text style={styles.stopAddress}>{stopInfo.address}</Text>
-          </View>
-          <View style={styles.infoArrival}>
-            <View style={styles.dateTimeContainerLeft}>
-              {iconGenerator("calendar-outline", 16, Colors.textLight2)}
-              <Text style={styles.stopArrivalDate}>
-                {formatDate(stopInfo.arrivalTime)}
+          <TouchableOpacity onPress={handleCardPress}>
+            {isActive && <Text style={styles.activeText}>Current Stop</Text>}
+            <Text
+              style={styles.stopName}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {stopInfo.place}
+            </Text>
+            <View style={styles.infoAddress}>
+              <Text
+                style={styles.stopAddress}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {stopInfo.address}
               </Text>
             </View>
-            {stopInfo.isWheelchairAccessible && (
-              <View>
-                {iconGenerator("body-outline", 16, Colors.textLight2)}
+            <View style={styles.infoArrival}>
+              <View style={styles.dateTimeContainerLeft}>
+                {iconGenerator("calendar-outline", 16, Colors.textLight2)}
+                <Text style={styles.stopArrivalDate}>
+                  {formatDate(stopInfo.arrivalTime)}
+                </Text>
               </View>
-            )}
-            {stopInfo.isKidFriendly && (
-              <View>
-                {iconGenerator("happy-outline", 16, Colors.textLight2)}
+              {stopInfo.isWheelchairAccessible && (
+                <View>
+                  {iconGenerator("body-outline", 16, Colors.textLight2)}
+                </View>
+              )}
+              {stopInfo.isKidFriendly && (
+                <View>
+                  {iconGenerator("happy-outline", 16, Colors.textLight2)}
+                </View>
+              )}
+              <View style={styles.dateTimeContainerRight}>
+                {iconGenerator("time-outline", 16, Colors.textLight2)}
+                <Text style={styles.stopArrivalTime}>
+                  {formatTime(stopInfo.arrivalTime)}
+                </Text>
               </View>
-            )}
-            <View style={styles.dateTimeContainerRight}>
-              {iconGenerator("time-outline", 16, Colors.textLight2)}
-              <Text style={styles.stopArrivalTime}>
-                {formatTime(stopInfo.arrivalTime)}
-              </Text>
             </View>
-          </View>
-          <TouchableOpacity
-            style={styles.ellipsisButton}
-            onPress={() => setActionModalVisible(true)}
-          >
-            {iconGenerator("ellipsis-vertical-outline", 16, Colors.accent)}
+            <TouchableOpacity
+              style={styles.ellipsisButton}
+              onPress={() => setActionModalVisible(true)}
+            >
+              {iconGenerator("ellipsis-vertical-outline", 16, Colors.accent)}
+            </TouchableOpacity>
           </TouchableOpacity>
-        </TouchableOpacity>
+        </Animated.View>
       </View>
       <ModalWindow
         isVisible={modalVisible}
@@ -154,8 +180,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   stopName: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: "Quicksand-SemiBold",
+    width: 200,
   },
   stopAddress: {
     fontSize: 16,
@@ -167,7 +194,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-end",
-    marginBottom: 5,
+    marginBottom: 10,
+    width: 200,
   },
   infoArrival: {
     flex: 1,
@@ -202,7 +230,7 @@ const styles = StyleSheet.create({
   },
   ellipsisButton: {
     position: "absolute",
-    right: 18,
-    top: 20,
+    right: 16,
+    top: 18,
   },
 });

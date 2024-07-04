@@ -27,19 +27,21 @@ export default function ModalStopAction({
           {iconGenerator("alert-circle-outline", 26, Colors.accent)}
           <Text style={styles.modalText}>Choose an action</Text>
           <View style={styles.buttonContainer}>
-            {onEdit && (
-              <Pressable style={styles.buttonOption} onPress={onEdit}>
-                <Text style={styles.buttonOptionText}>Edit</Text>
-              </Pressable>
-            )}
-            {onDelete && (
-              <Pressable style={styles.buttonOption} onPress={onDelete}>
-                <Text style={styles.buttonOptionText}>Delete</Text>
-              </Pressable>
-            )}
             <Pressable style={styles.buttonClose} onPress={onClose}>
               <Text style={styles.buttonCloseText}>Cancel</Text>
             </Pressable>
+            <View style={styles.actionButtons}>
+              {onEdit && (
+                <Pressable style={styles.buttonOption} onPress={onEdit}>
+                  <Text style={styles.buttonOptionText}>Edit</Text>
+                </Pressable>
+              )}
+              {onDelete && (
+                <Pressable style={styles.buttonDeleteOption} onPress={onDelete}>
+                  <Text style={styles.buttonDeleteText}>Delete</Text>
+                </Pressable>
+              )}
+            </View>
           </View>
         </View>
       </Modal>
@@ -57,10 +59,16 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonContainer: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     justifyContent: "space-between",
     marginTop: 20,
     width: "100%",
+    alignItems: "center",
+  },
+  actionButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   buttonOption: {
     backgroundColor: Colors.accent,
@@ -68,13 +76,18 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 20,
   },
+  buttonDeleteOption: {
+    borderRadius: 20,
+  },
+  buttonDeleteText: {
+    fontFamily: "Quicksand-Bold",
+    color: Colors.error,
+  },
   buttonOptionText: {
     fontFamily: "Quicksand-Bold",
     color: Colors.textLight,
   },
   buttonClose: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
     borderRadius: 20,
   },
   buttonCloseText: {

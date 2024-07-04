@@ -9,7 +9,8 @@ import {
 import Colors from "../styles/colors";
 import { formatDate } from "../utils/DateFormatter";
 import { LinearGradient } from "expo-linear-gradient";
-import SparklesIcon from "../assets/sparkles.svg";
+import iconGenerator from "../utils/IconGenerator";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 function TripComponent({ trip, onPress }) {
   return (
@@ -31,7 +32,7 @@ function TripComponent({ trip, onPress }) {
           </View>
           {trip.type === "generated" && (
             <View style={styles.iconContainer}>
-              <SparklesIcon width={24} height={24} fill={Colors.textLight} />
+              {iconGenerator("color-wand", 26, Colors.background)}
             </View>
           )}
         </LinearGradient>
