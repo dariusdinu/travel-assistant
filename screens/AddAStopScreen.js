@@ -65,6 +65,7 @@ export default function AddAStopScreen() {
       : {};
 
   async function submitHandler(stopDetails) {
+    console.log(stopDetails);
     let {
       place,
       address,

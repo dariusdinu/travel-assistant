@@ -17,6 +17,14 @@ function StopForm({ onSubmit, initialData, buttonText }) {
     return !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
   };
 
+  const defaultValues = {
+    place: "Ufizzi Museum",
+    address: "Piazzale degli Uffizi, 6",
+    website:
+      "https://uffizi-gallery.tickets-florence.it/?gad_source=1&gclid=CjwKCAjwkJm0BhBxEiwAwT1AXBpOozVw3VgyInzLitBH9Wsu4lMh1im9Yk5d19GSoW0X3_jZLPJVKBoCWhIQAvD_BwE",
+    notes: "We need to get there early",
+  };
+
   const [enteredPlace, setEnteredPlace] = useState(initialData?.place || "");
   const [enteredAddress, setEnteredAddress] = useState(
     initialData?.address || ""
@@ -75,11 +83,11 @@ function StopForm({ onSubmit, initialData, buttonText }) {
     combinedDateTime.setMinutes(enteredArrivalTime.getMinutes());
 
     onSubmit({
-      place: enteredPlace,
-      address: enteredAddress,
+      place: enteredPlace || defaultValues.place,
+      address: enteredAddress || defaultValues.address,
       arrivalTime: combinedDateTime.toISOString(),
-      website: enteredWebsite,
-      notes: enteredNotes,
+      website: enteredWebsite || defaultValues.website,
+      notes: enteredNotes || defaultValues.notes,
       images: enteredImages,
       additionalFiles: enteredFiles,
     });
