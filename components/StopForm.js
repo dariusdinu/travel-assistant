@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Input } from "./UI";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, TextInput } from "react-native";
 import DateInput from "./DateInput";
 import ImagePickerComponent from "./ImagePickerComponent";
 import Colors from "../styles/colors";
@@ -91,12 +91,6 @@ function StopForm({ onSubmit, initialData, buttonText }) {
     setEnteredImages(newImages);
   };
 
-  const handleLocationSelect = (location) => {
-    setEnteredPlace(
-      `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
-    );
-  };
-
   const handleFilePicked = (file) => {
     setEnteredFiles([...enteredFiles, file]);
   };
@@ -109,6 +103,7 @@ function StopForm({ onSubmit, initialData, buttonText }) {
         onUpdateValue={(value) => handleInputValueUpdate("place", value)}
         placeholder="Choose a place"
         ref={inputPlaceRef}
+        defaultValue={"Ufizzi Museum"}
       />
       <Input
         label="Address"
@@ -116,6 +111,7 @@ function StopForm({ onSubmit, initialData, buttonText }) {
         onUpdateValue={(value) => handleInputValueUpdate("address", value)}
         placeholder="What is the address?"
         ref={inputAddressRef}
+        defaultValue={"Piazzale degli Uffizi, 6"}
       />
       <DateInput
         label="Arrival Date"
@@ -135,6 +131,9 @@ function StopForm({ onSubmit, initialData, buttonText }) {
         onUpdateValue={(value) => handleInputValueUpdate("website", value)}
         placeholder="Specify the website"
         ref={inputWebsiteRef}
+        defaultValue={
+          "https://uffizi-gallery.tickets-florence.it/?gad_source=1&gclid=CjwKCAjwkJm0BhBxEiwAwT1AXBpOozVw3VgyInzLitBH9Wsu4lMh1im9Yk5d19GSoW0X3_jZLPJVKBoCWhIQAvD_BwE"
+        }
       />
       <Input
         label="Notes"
@@ -144,6 +143,7 @@ function StopForm({ onSubmit, initialData, buttonText }) {
         onUpdateValue={(value) => handleInputValueUpdate("notes", value)}
         placeholder="Add important notes"
         ref={inputNotesRef}
+        defaultValue={"We need to get there early"}
       />
       <Text style={styles.label}>Images</Text>
       <View style={styles.imagesContainer}>

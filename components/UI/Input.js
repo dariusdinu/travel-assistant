@@ -25,6 +25,7 @@ const Input = forwardRef(
       value,
       multiline,
       numberOfLines,
+      defaultValue,
     },
     ref
   ) => {
@@ -52,6 +53,7 @@ const Input = forwardRef(
             placeholderTextColor={"lightgrey"}
             multiline={multiline}
             numberOfLines={numberOfLines}
+            defaultValue={defaultValue}
           />
           {secure && (
             <TouchableOpacity
